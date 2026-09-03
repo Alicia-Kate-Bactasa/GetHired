@@ -49,6 +49,8 @@ With an allocated budget of 100K, the project is well within financial feasibili
 ### Core Feature
 The central pillar of this proposed system is allowing students to browse partners by category, directly solving the inefficiency of having students manually check individual companies from a master list.
 
+If the budget is cut to 50,000, the features that remain are the centralized company directory with category browsing and the mock interview module featuring multiple-choice and fixed essay-type questions, while the external AI-powered feedback integration is cut to reduce API costs.
+
 ### Team Members
 - Lloyd Anton P. Montero
 - Alicia Kate T. Bactasa
