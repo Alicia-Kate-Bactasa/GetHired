@@ -16,6 +16,7 @@ The platform will also provide category-based mock interviews. Students can sele
 
 
 ### Existing Solutions
+LinkedIn, Jobstreet, and other job posting applications were used by students to check and avail if there are internship opportunities offered by companies. Even Facebook and other social media platforms were used by students to stay updated for announcements released by companies that are using social media for either job offerings or internships. However, students may need to research companies by either visiting their profiles and may also lack sufficient preparation for the interview process as well which in return, doesn’t necessarily resolve the problem entirely.
 
 ### What Makes the App Different
 GetHired is specifically designed around the needs of **DCISM students** seeking OJT or practicum opportunities, rather than general job seekers. Instead of requiring students to search through different platforms and research companies individually, GetHired provides a centralized directory of DCISM industry partners in one place.
