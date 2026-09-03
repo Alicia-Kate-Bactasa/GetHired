@@ -47,7 +47,7 @@ With an allocated budget of 100K, the project is well within financial feasibili
 
 
 ### Core Feature
-
+The central pillar of this proposed system is allowing students to browse partners by category, directly solving the inefficiency of having students manually check individual companies from a master list.
 
 ### Team Members
 - Lloyd Anton P. Montero
