@@ -31,6 +31,20 @@ Rather than competing directly with platforms such as LinkedIn or JobStreet, Get
 
 
 ### Feasibility Check
+Feasibility: Highly Feasible
+
+**Technical Feasibility:**
+The proposed tech stack is industry-standard and well-documented. Outsourcing the complex essay-evaluation logic to an external AI API is a practical, highly achievable approach that avoids the overhead of training custom machine learning models. 
+
+**Schedule Feasibility:**
+The allocated 16-week project timeline is realistic and methodically structured. Breaking the project into six distinct sprints allows for iterative development, with dedicated weeks specifically reserved for user testing, bug fixing, and deployment.
+
+**Skill Feasibility:**
+The team is organized with clear, non-overlapping responsibilities (Directory UI, Auth/Accounts UI, Admin Panel, AI/Backend Integration, and Database/DevOps). This modular division of labor ensures all architectural layers are covered without creating development bottlenecks.  
+
+**Economic Feasibility:**
+With an allocated budget of 100K, the project is well within financial feasibility. The chosen tech stack and API operate on generous free-to-low-cost tiers, keeping foundational infrastructure expenses near zero. The budget provides more than enough capital to comfortably cover domain registration, API scaling, potential tier upgrades, user testing incentives, and operational contingencies. 
+
 
 ### Core Feature
 
