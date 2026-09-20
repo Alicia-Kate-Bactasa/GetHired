@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Serif+Text&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'DM Serif Display', serif;
+  --font-serif: 'DM Serif Text', serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+
+  --color-primary: #0073ff;
+  --color-secondary: #4869ff;
+  --color-hero-bg: #b8d0ff;
+  --color-section-bg: #dfe9ff;
+  --color-heading: #302929;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover {
+  scrollbar-color: rgba(0, 115, 255, 0.15) transparent;
+}
