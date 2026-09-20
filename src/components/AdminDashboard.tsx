@@ -1,0 +1,1665 @@
+"use client";
+
+import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import CompanyCard from "./CompanyCard";
+import CategoryCard, { CategoryIcon } from "./CategoryCard";
+import {
+  companies as defaultCompanies,
+  interviewCategories as defaultCategories,
+  interviewQuestions as defaultQuestions,
+  codingChallenges as defaultChallenges,
+  initialStudents,
+  Company,
+  Student,
+  InterviewCategory,
+  InterviewQuestion,
+  generateDefaultPassword,
+  getCategoryPipeline,
+} from "../data";
+
+type AdminTab = "companies" | "students" | "interviews";
+
+/* ═══════════════════════════════ SVG ICONS ═══════════════════════════ */
+const BuildingIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+    <path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
+  </svg>
+);
+
+const UsersIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const MicIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" />
+  </svg>
+);
+
+const PlusIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+const SearchIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+  </svg>
+);
+
+const EditIcon = ({ size = 15 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+const TrashIcon = ({ size = 15 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
+const LogOutIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const CropIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+    <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+  </svg>
+);
+
+const CopyIcon = ({ size = 13 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+);
+
+const CheckIcon = ({ size = 14 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+/* Available specialization tags */
+const ALL_SPECIALIZATIONS = [
+  "Software Dev",
+  "Full-Stack",
+  "Frontend Dev",
+  "React / Node.js",
+  "Mobile & Web",
+  "UI/UX Design",
+  "Enterprise Dev",
+  "Cloud / DevOps",
+  "Supply Chain Systems",
+  "Python",
+  "Data Analytics",
+  "Machine Learning",
+  "Network Security",
+  "Penetration Testing",
+  "Threat Analysis",
+  "Customer Support",
+  "Technical Support",
+  "Voice & Non-Voice",
+  "Database Admin",
+  "Network Engineering",
+  "Software QA",
+  "Game Dev",
+];
+
+/* ═══════════════════════════════ IMAGE CROPPER MODAL ═════════════════ */
+function ImageCropperModal({
+  imageSrc,
+  onApply,
+  onClose,
+}: {
+  imageSrc: string;
+  onApply: (croppedDataUrl: string) => void;
+  onClose: () => void;
+}) {
+  const [zoom, setZoom] = useState(1);
+  const [offsetX, setOffsetX] = useState(0);
+  const [offsetY, setOffsetY] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  // Load and preview image
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imageSrc;
+    img.onload = () => {
+      imgRef.current = img;
+      renderPreview();
+    };
+  }, [imageSrc]);
+
+  useEffect(() => {
+    renderPreview();
+  }, [zoom, offsetX, offsetY]);
+
+  const renderPreview = () => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const targetWidth = 600;
+    const targetHeight = 260;
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    ctx.clearRect(0, 0, targetWidth, targetHeight);
+
+    // Compute scaled cover dimensions
+    const scale = Math.max(targetWidth / img.width, targetHeight / img.height) * zoom;
+    const sw = targetWidth / scale;
+    const sh = targetHeight / scale;
+
+    const sx = Math.max(0, Math.min(img.width - sw, (img.width - sw) / 2 + offsetX * (img.width / 200)));
+    const sy = Math.max(0, Math.min(img.height - sh, (img.height - sh) / 2 + offsetY * (img.height / 200)));
+
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+  };
+
+  const handleSaveCrop = () => {
+    if (canvasRef.current) {
+      const croppedUrl = canvasRef.current.toDataURL("image/jpeg", 0.9);
+      onApply(croppedUrl);
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-[32px] w-full max-w-[620px] p-6 sm:p-7 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-[19px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+              Crop Company Cover Photo
+            </h3>
+            <p className="text-[12.5px] text-slate-400">
+              Adjust zoom and position to fit the 600×260 company card banner.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+          >
+            <XIcon />
+          </button>
+        </div>
+
+        {/* Live Canvas Preview */}
+        <div className="relative w-full aspect-[600/260] bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 shadow-inner flex items-center justify-center mb-5">
+          <canvas ref={canvasRef} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 pointer-events-none border-2 border-dashed border-[#0066FF]/40 rounded-2xl" />
+        </div>
+
+        {/* Controls */}
+        <div className="space-y-3.5 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <div>
+            <div className="flex justify-between text-[12px] font-medium text-slate-600 mb-1">
+              <span>Zoom</span>
+              <span>{zoom.toFixed(1)}x</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="3"
+              step="0.1"
+              value={zoom}
+              onChange={(e) => setZoom(parseFloat(e.target.value))}
+              className="w-full accent-[#0066FF] cursor-pointer"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="flex justify-between text-[12px] font-medium text-slate-600 mb-1">
+                <span>Pan X</span>
+                <span>{offsetX > 0 ? `+${offsetX}` : offsetX}</span>
+              </div>
+              <input
+                type="range"
+                min="-50"
+                max="50"
+                value={offsetX}
+                onChange={(e) => setOffsetX(parseInt(e.target.value))}
+                className="w-full accent-[#0066FF] cursor-pointer"
+              />
+            </div>
+            <div>
+              <div className="flex justify-between text-[12px] font-medium text-slate-600 mb-1">
+                <span>Pan Y</span>
+                <span>{offsetY > 0 ? `+${offsetY}` : offsetY}</span>
+              </div>
+              <input
+                type="range"
+                min="-50"
+                max="50"
+                value={offsetY}
+                onChange={(e) => setOffsetY(parseInt(e.target.value))}
+                className="w-full accent-[#0066FF] cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-3 border border-slate-200 text-slate-600 text-[14px] font-semibold rounded-full hover:bg-slate-50 transition-all cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveCrop}
+            className="flex-1 py-3 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[14px] font-semibold rounded-full transition-all shadow-md shadow-blue-500/20 cursor-pointer"
+          >
+            Apply Cropped Photo
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════ MAIN ADMIN COMPONENT ═════════════════ */
+export default function AdminDashboard() {
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<AdminTab>("companies");
+  const [collapsed, setCollapsed] = useState(false);
+
+  // States for Companies
+  const [companies, setCompanies] = useState<Company[]>(defaultCompanies);
+  const [companySearch, setCompanySearch] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState<string>("All");
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [cropModalSrc, setCropModalSrc] = useState<string | null>(null);
+
+  // Company Form state
+  const [compForm, setCompForm] = useState<Partial<Company>>({
+    name: "",
+    industry: "Software Development",
+    type: "Software Services",
+    location: "Cebu City",
+    slots: 5,
+    description: "",
+    website: "",
+    email: "",
+    phone: "",
+    hours: "Mon – Fri, 8:00 AM – 5:00 PM",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=260&fit=crop&auto=format",
+    specializations: ["Software Dev"],
+  });
+
+  // States for Students
+  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [studentSearch, setStudentSearch] = useState("");
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState("All");
+  const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Student Form state
+  const [studForm, setStudForm] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    course: "BS Information Technology",
+    yearLevel: "4th Year",
+    email: "",
+  });
+
+  // States for Interview Categories & Questions
+  const [categories, setCategories] = useState<InterviewCategory[]>(defaultCategories);
+  const [questionsMap, setQuestionsMap] = useState<Record<string, InterviewQuestion[]>>(defaultQuestions);
+  const [selectedCategoryForQuestions, setSelectedCategoryForQuestions] = useState<InterviewCategory | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<InterviewCategory | null>(null);
+  const [catForm, setCatForm] = useState({
+    name: "",
+    description: "",
+    color: "#0066FF",
+    bg: "#dfe9ff",
+  });
+
+  // Question Form state (inside Question Manager)
+  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
+  const [editingQuestionIdx, setEditingQuestionIdx] = useState<number | null>(null);
+  const [questionForm, setQuestionForm] = useState<InterviewQuestion>({
+    question: "",
+    type: "Technical",
+    hint: "",
+    feedback: "",
+  });
+
+  /* ── Company Actions ── */
+  const handleOpenAddCompany = () => {
+    setEditingCompany(null);
+    setCompForm({
+      name: "",
+      industry: "Software Development",
+      type: "Software Services",
+      location: "Cebu IT Park, Cebu City",
+      slots: 5,
+      description: "",
+      website: "",
+      email: "",
+      phone: "+63 32 412 8888",
+      hours: "Mon – Fri, 9:00 AM – 6:00 PM",
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=260&fit=crop&auto=format",
+      specializations: ["Software Dev", "React / Node.js"],
+    });
+    setIsCompanyModalOpen(true);
+  };
+
+  const handleOpenEditCompany = (c: Company) => {
+    setEditingCompany(c);
+    setCompForm({ ...c });
+    setIsCompanyModalOpen(true);
+  };
+
+  const handleDeleteCompany = (id: number) => {
+    if (confirm("Are you sure you want to remove this industry partner?")) {
+      setCompanies((prev) => prev.filter((c) => c.id !== id));
+    }
+  };
+
+  const handleSaveCompany = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!compForm.name) return;
+
+    if (editingCompany) {
+      setCompanies((prev) =>
+        prev.map((c) => (c.id === editingCompany.id ? ({ ...c, ...compForm } as Company) : c))
+      );
+    } else {
+      const newCompany: Company = {
+        id: Date.now(),
+        name: compForm.name || "New Partner",
+        industry: compForm.industry || "Information Technology",
+        type: compForm.type || "Enterprise",
+        specializations: compForm.specializations || ["Software Dev"],
+        location: compForm.location || "Cebu City",
+        slots: Number(compForm.slots) || 4,
+        description: compForm.description || "",
+        image:
+          compForm.image ||
+          "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=260&fit=crop&auto=format",
+        saved: false,
+        website: compForm.website || "",
+        email: compForm.email || "",
+        phone: compForm.phone || "",
+        hours: compForm.hours || "Mon – Fri, 8:00 AM – 5:00 PM",
+      };
+      setCompanies((prev) => [newCompany, ...prev]);
+    }
+    setIsCompanyModalOpen(false);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCropModalSrc(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const toggleSpec = (spec: string) => {
+    const current = compForm.specializations || [];
+    if (current.includes(spec)) {
+      setCompForm({ ...compForm, specializations: current.filter((s) => s !== spec) });
+    } else {
+      setCompForm({ ...compForm, specializations: [...current, spec] });
+    }
+  };
+
+  /* ── Student Actions ── */
+  const handleOpenAddStudent = () => {
+    setEditingStudent(null);
+    setStudForm({
+      id: `202${Math.floor(Math.random() * 3 + 1)}-00${Math.floor(Math.random() * 800 + 100)}`,
+      firstName: "",
+      lastName: "",
+      course: "BS Information Technology",
+      yearLevel: "4th Year",
+      email: "",
+    });
+    setIsStudentModalOpen(true);
+  };
+
+  const handleOpenEditStudent = (s: Student) => {
+    setEditingStudent(s);
+    setStudForm({
+      id: s.id,
+      firstName: s.firstName,
+      lastName: s.lastName,
+      course: s.course,
+      yearLevel: s.yearLevel,
+      email: s.email,
+    });
+    setIsStudentModalOpen(true);
+  };
+
+  const handleDeleteStudent = (id: string) => {
+    if (confirm(`Remove student ${id} from the official DCISM database?`)) {
+      setStudents((prev) => prev.filter((s) => s.id !== id));
+    }
+  };
+
+  const handleSaveStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!studForm.id || !studForm.firstName || !studForm.lastName) return;
+
+    const defaultPwd = generateDefaultPassword(studForm.id, studForm.firstName);
+    const emailComputed = studForm.email || `${studForm.firstName.toLowerCase()}.${studForm.lastName.toLowerCase()}@cit.edu`;
+
+    if (editingStudent) {
+      setStudents((prev) =>
+        prev.map((s) =>
+          s.id === editingStudent.id
+            ? {
+                ...s,
+                ...studForm,
+                email: emailComputed,
+                defaultPassword: generateDefaultPassword(studForm.id, studForm.firstName),
+              }
+            : s
+        )
+      );
+    } else {
+      const newStudent: Student = {
+        id: studForm.id,
+        firstName: studForm.firstName,
+        lastName: studForm.lastName,
+        course: studForm.course,
+        yearLevel: studForm.yearLevel,
+        email: emailComputed,
+        defaultPassword: defaultPwd,
+      };
+      setStudents((prev) => [newStudent, ...prev]);
+    }
+    setIsStudentModalOpen(false);
+  };
+
+  const handleCopyPassword = (pwd: string, id: string) => {
+    navigator.clipboard.writeText(pwd);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  /* ── Interview Actions ── */
+  const handleOpenAddCategory = () => {
+    setEditingCategory(null);
+    setCatForm({
+      name: "",
+      description: "",
+      color: "#0066FF",
+      bg: "#dfe9ff",
+    });
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleOpenEditCategory = (cat: InterviewCategory) => {
+    setEditingCategory(cat);
+    setCatForm({
+      name: cat.name,
+      description: cat.description,
+      color: cat.color,
+      bg: cat.bg,
+    });
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleSaveCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catForm.name) return;
+
+    if (editingCategory) {
+      setCategories((prev) =>
+        prev.map((c) => (c.id === editingCategory.id ? { ...c, ...catForm } : c))
+      );
+      if (selectedCategoryForQuestions?.id === editingCategory.id) {
+        setSelectedCategoryForQuestions((prev) => (prev ? { ...prev, ...catForm } : null));
+      }
+    } else {
+      const newId = catForm.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const newCat: InterviewCategory = {
+        id: newId,
+        name: catForm.name,
+        description: catForm.description,
+        color: catForm.color || "#0066FF",
+        bg: catForm.bg || "#dfe9ff",
+      };
+      setCategories((prev) => [...prev, newCat]);
+      setQuestionsMap((prev) => ({ ...prev, [newId]: [] }));
+    }
+    setIsCategoryModalOpen(false);
+  };
+
+  const handleDeleteCategory = (id: string) => {
+    if (confirm("Delete this interview category and all its questions?")) {
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      if (selectedCategoryForQuestions?.id === id) {
+        setSelectedCategoryForQuestions(null);
+      }
+    }
+  };
+
+  const handleOpenAddQuestion = () => {
+    setEditingQuestionIdx(null);
+    setQuestionForm({
+      question: "",
+      type: "Technical",
+      hint: "",
+      feedback: "",
+    });
+    setIsQuestionModalOpen(true);
+  };
+
+  const handleOpenEditQuestion = (idx: number, q: InterviewQuestion) => {
+    setEditingQuestionIdx(idx);
+    setQuestionForm({ ...q });
+    setIsQuestionModalOpen(true);
+  };
+
+  const handleSaveQuestion = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCategoryForQuestions || !questionForm.question) return;
+
+    const catId = selectedCategoryForQuestions.id;
+    const currentList = questionsMap[catId] || [];
+
+    if (editingQuestionIdx !== null) {
+      const updated = [...currentList];
+      updated[editingQuestionIdx] = { ...questionForm };
+      setQuestionsMap({ ...questionsMap, [catId]: updated });
+    } else {
+      setQuestionsMap({ ...questionsMap, [catId]: [...currentList, questionForm] });
+    }
+    setIsQuestionModalOpen(false);
+  };
+
+  const handleDeleteQuestion = (idx: number) => {
+    if (!selectedCategoryForQuestions) return;
+    const catId = selectedCategoryForQuestions.id;
+    const currentList = questionsMap[catId] || [];
+    setQuestionsMap({
+      ...questionsMap,
+      [catId]: currentList.filter((_, i) => i !== idx),
+    });
+  };
+
+  /* Filtered Data */
+  const filteredCompanies = companies.filter((c) => {
+    const matchesSearch =
+      c.name.toLowerCase().includes(companySearch.toLowerCase()) ||
+      c.location.toLowerCase().includes(companySearch.toLowerCase()) ||
+      c.specializations.some((s) => s.toLowerCase().includes(companySearch.toLowerCase()));
+    const matchesIndustry = selectedIndustry === "All" || c.industry === selectedIndustry;
+    return matchesSearch && matchesIndustry;
+  });
+
+  const filteredStudents = students.filter((s) => {
+    const matchesSearch =
+      s.id.toLowerCase().includes(studentSearch.toLowerCase()) ||
+      `${s.firstName} ${s.lastName}`.toLowerCase().includes(studentSearch.toLowerCase()) ||
+      s.email.toLowerCase().includes(studentSearch.toLowerCase());
+    const matchesCourse = selectedCourseFilter === "All" || s.course === selectedCourseFilter;
+    return matchesSearch && matchesCourse;
+  });
+
+  const uniqueIndustries = ["All", ...Array.from(new Set(companies.map((c) => c.industry)))];
+  const uniqueCourses = [
+    "All",
+    "BS Computer Science",
+    "BS Information Technology",
+    "BS Information Systems",
+    "BS Computer Engineering",
+  ];
+
+  return (
+    <div className="h-screen flex bg-[#f5f7ff] overflow-hidden text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
+
+      {/* ═══ ADMIN SIDEBAR ═══ */}
+      <div
+        className="p-3 shrink-0 flex flex-col transition-all duration-300"
+        style={{ width: collapsed ? 88 : 260 }}
+      >
+        <aside className={`bg-white rounded-[36px] flex flex-col py-6 overflow-hidden h-full shadow-sm border border-slate-100 ${collapsed ? "px-2.5" : ""}`}>
+          {/* Logo & Admin Tag */}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={`mb-8 cursor-pointer flex items-center transition-all ${
+              collapsed ? "px-0 justify-center w-full" : "px-5 gap-2.5 text-left"
+            }`}
+          >
+            <img
+              src="/getHiredLogo.PNG"
+              alt="GetHired Logo"
+              className="w-10 h-10 object-contain shrink-0"
+            />
+            {!collapsed && (
+              <div>
+                <div className="text-[20px] font-bold tracking-tight text-[#0066FF] leading-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                  GetHired
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Admin Console
+                </div>
+              </div>
+            )}
+          </button>
+
+          {/* Navigation items */}
+          <nav className={`flex flex-col gap-1.5 flex-1 ${collapsed ? "px-0" : "px-2"}`}>
+            {[
+              { id: "companies",  label: "Companies",  badge: companies.length, Icon: BuildingIcon },
+              { id: "students",   label: "Students",   badge: students.length,  Icon: UsersIcon },
+              { id: "interviews", label: "Interviews", badge: categories.length, Icon: MicIcon },
+            ].map(({ id, label, badge, Icon }) => (
+              <button
+                key={id}
+                onClick={() => {
+                  setActiveTab(id as AdminTab);
+                  setSelectedCategoryForQuestions(null);
+                }}
+                title={collapsed ? label : undefined}
+                className={`flex items-center gap-3 py-3 rounded-[24px] text-[14px] font-medium transition-all cursor-pointer ${
+                  collapsed ? "justify-center px-0 w-full" : "px-4"
+                } ${
+                  activeTab === id
+                    ? "bg-[#0066FF] text-white shadow-md shadow-blue-500/20"
+                    : "text-slate-600 hover:text-[#0066FF] hover:bg-[#dfe9ff]/60"
+                }`}
+              >
+                <Icon size={18} />
+                {!collapsed && (
+                  <div className="flex-1 flex items-center justify-between text-left">
+                    <span>{label}</span>
+                    <span
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                        activeTab === id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      {badge}
+                    </span>
+                  </div>
+                )}
+              </button>
+            ))}
+          </nav>
+
+          {/* Quick link to student portal */}
+          {!collapsed && (
+            <div className="px-4 mb-3">
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard")}
+                className="w-full text-[12px] font-semibold text-[#0066FF] bg-[#EEF5FF] hover:bg-[#dfe9ff] py-2 rounded-full transition-all cursor-pointer text-center"
+              >
+                Go to Student Portal →
+              </button>
+            </div>
+          )}
+
+          {/* Centered Logout */}
+          <div className="px-2 flex justify-center">
+            <button
+              onClick={() => router.push("/login")}
+              title={collapsed ? "Log out" : undefined}
+              className="flex items-center justify-center gap-2 py-3 rounded-[24px] text-[13.5px] font-medium text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all w-full cursor-pointer"
+            >
+              <LogOutIcon />
+              {!collapsed && <span>Log out</span>}
+            </button>
+          </div>
+        </aside>
+      </div>
+
+      {/* ═══ MAIN WORKSPACE ═══ */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        {/* Top Header */}
+        <header className="flex items-center justify-between px-8 py-5 shrink-0 border-b border-slate-200/70 bg-white/70 backdrop-blur-xs">
+          <div>
+            <h1 className="text-[26px] font-bold text-[#0F172A] tracking-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
+              {activeTab === "companies" && "Industry Partner Directory"}
+              {activeTab === "students" && "DCISM Student Registry"}
+              {activeTab === "interviews" && "Interview Categories & Question Bank"}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-slate-200 text-[12.5px] font-medium text-slate-600 hover:border-[#0066FF] hover:text-[#0066FF] transition-all cursor-pointer bg-white shadow-2xs"
+            >
+              <span>Preview Student View</span>
+              <span>↗</span>
+            </button>
+            <div className="flex items-center gap-2.5 bg-white border border-slate-200/90 rounded-full pl-1.5 pr-4 py-1.5 shadow-2xs">
+              <div className="w-8 h-8 rounded-full bg-[#0066FF] text-white font-bold text-[13px] flex items-center justify-center">
+                A
+              </div>
+              <div className="text-left leading-tight hidden sm:block">
+                <div className="text-[12.5px] font-semibold text-[#0F172A]">Administrator</div>
+                <div className="text-[10.5px] text-slate-400">admin@cit.edu</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content Body */}
+        <main className="flex-1 overflow-y-auto px-8 py-7">
+
+          {/* ════════════════════ TAB 1: COMPANIES ════════════════════ */}
+          {activeTab === "companies" && (
+            <div>
+              {/* Header Bar with Filters and Add Button */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-wrap items-center gap-3 flex-1 max-w-2xl">
+                  {/* Search input */}
+                  <div className="relative flex-1 min-w-[240px]">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                      <SearchIcon size={16} />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Search company name, location, niche..."
+                      value={companySearch}
+                      onChange={(e) => setCompanySearch(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-full pl-10 pr-4 py-2 text-[13.5px] outline-none focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
+                    />
+                  </div>
+
+                  {/* Industry filter */}
+                  <select
+                    value={selectedIndustry}
+                    onChange={(e) => setSelectedIndustry(e.target.value)}
+                    className="bg-white border border-slate-200 rounded-full px-4 py-2 text-[13.5px] text-slate-700 outline-none focus:border-[#0066FF] cursor-pointer"
+                  >
+                    {uniqueIndustries.map((ind) => (
+                      <option key={ind} value={ind}>{ind}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleOpenAddCompany}
+                  className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98"
+                >
+                  <PlusIcon size={16} />
+                  <span>Add Company</span>
+                </button>
+              </div>
+
+              {/* Metrics Summary */}
+              <div className="flex items-center justify-between mb-4 text-[13px] text-slate-500 font-medium">
+                <div>
+                  Showing <span className="font-bold text-[#0F172A]">{filteredCompanies.length}</span> accredited industry partners
+                </div>
+                <div className="text-slate-400">
+                  Total OJT Slots: <span className="font-bold text-emerald-600">{companies.reduce((sum, c) => sum + c.slots, 0)}</span>
+                </div>
+              </div>
+
+              {/* Companies Grid using shared CompanyCard component */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {filteredCompanies.map((c) => (
+                  <CompanyCard
+                    key={c.id}
+                    company={c}
+                    isAdmin={true}
+                    onEdit={handleOpenEditCompany}
+                    onDelete={handleDeleteCompany}
+                  />
+                ))}
+              </div>
+
+              {filteredCompanies.length === 0 && (
+                <div className="bg-white rounded-[28px] p-12 text-center text-slate-400 text-[14px] border border-slate-200/80">
+                  No industry partners match your query.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ════════════════════ TAB 2: STUDENTS ════════════════════ */}
+          {activeTab === "students" && (
+            <div>
+              {/* Notice Banner about Password Formula */}
+              <div className="mb-6 p-5 bg-blue-50/80 border border-blue-100 rounded-[32px] flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-full bg-[#0066FF] text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+                <div className="text-[13px] text-blue-900 leading-relaxed">
+                  <span className="font-bold">Student Credential Policy:</span> All DCISM student accounts have their default password pre-filled as{" "}
+                  <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono font-semibold text-[#0066FF]">
+                    idnumber_firstname
+                  </code>{" "}
+                  (e.g., <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono text-[#0066FF]">2021-00123_ishie</code>). Students can independently update their password at any time via the Forgot Password prompt on the login screen.
+                </div>
+              </div>
+
+              {/* Filters and Add Student Button */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-wrap items-center gap-3 flex-1 max-w-2xl">
+                  {/* Search student */}
+                  <div className="relative flex-1 min-w-[240px]">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                      <SearchIcon size={16} />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Search by ID, name, or email..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-full pl-10 pr-4 py-2 text-[13.5px] outline-none focus:border-[#0066FF] focus:ring-2 focus:ring-[#0066FF]/10 transition-all"
+                    />
+                  </div>
+
+                  {/* Course dropdown */}
+                  <select
+                    value={selectedCourseFilter}
+                    onChange={(e) => setSelectedCourseFilter(e.target.value)}
+                    className="bg-white border border-slate-200 rounded-full px-4 py-2 text-[13.5px] text-slate-700 outline-none focus:border-[#0066FF] cursor-pointer"
+                  >
+                    {uniqueCourses.map((crs) => (
+                      <option key={crs} value={crs}>{crs}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleOpenAddStudent}
+                  className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98"
+                >
+                  <PlusIcon size={16} />
+                  <span>Add Student</span>
+                </button>
+              </div>
+
+              {/* Minimalist Student Table List */}
+              <div className="bg-white rounded-[32px] border border-slate-200/80 shadow-2xs overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <div className="text-[13px] font-bold uppercase tracking-wider text-slate-500">
+                    Enrolled Students ({filteredStudents.length})
+                  </div>
+                  <div className="text-[12px] text-slate-400">
+                    DCISM Official Registry
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-[13.5px]">
+                    <thead>
+                      <tr className="border-b border-slate-100 text-slate-400 text-[11.5px] uppercase font-bold tracking-wider bg-slate-50/40">
+                        <th className="py-3 px-6">Student ID</th>
+                        <th className="py-3 px-6">Full Name</th>
+                        <th className="py-3 px-6">Course & Year</th>
+                        <th className="py-3 px-6">Generated Default Password</th>
+                        <th className="py-3 px-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredStudents.map((s) => (
+                        <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="py-4 px-6 font-mono font-bold text-[#0F172A]">
+                            {s.id}
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-semibold text-[#0F172A]">{s.firstName} {s.lastName}</div>
+                            <div className="text-[11.5px] text-slate-400">{s.email}</div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-medium text-slate-700">{s.course}</div>
+                            <div className="text-[11.5px] text-slate-400">{s.yearLevel}</div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-2">
+                              <code className="bg-slate-100 px-3 py-1 rounded-full text-[11.5px] font-mono text-slate-700 select-all">
+                                {s.defaultPassword}
+                              </code>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyPassword(s.defaultPassword, s.id)}
+                                className="text-slate-400 hover:text-[#0066FF] transition-colors p-1 cursor-pointer"
+                                title="Copy default password"
+                              >
+                                {copiedId === s.id ? <CheckIcon size={14} /> : <CopyIcon size={13} />}
+                              </button>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditStudent(s)}
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0066FF] flex items-center justify-center transition-colors cursor-pointer"
+                                title="Edit Student"
+                              >
+                                <EditIcon size={14} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteStudent(s.id)}
+                                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+                                title="Delete Student"
+                              >
+                                <TrashIcon size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+
+                      {filteredStudents.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="text-center py-12 text-slate-400">
+                            No students match your query.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ════════════════════ TAB 3: INTERVIEWS ════════════════════ */}
+          {activeTab === "interviews" && (
+            <div>
+              {/* If a category is selected to manage its questions */}
+              {selectedCategoryForQuestions ? (
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCategoryForQuestions(null)}
+                      className="inline-flex items-center gap-2 text-slate-500 hover:text-[#0066FF] text-[13.5px] font-semibold transition-colors cursor-pointer"
+                    >
+                      <span>← Back to all Categories</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleOpenAddQuestion}
+                      className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13px] font-semibold px-4.5 py-2 rounded-full transition-all cursor-pointer shadow-sm"
+                    >
+                      <PlusIcon size={15} />
+                      <span>Add Question</span>
+                    </button>
+                  </div>
+
+                  {/* Category Banner with icon */}
+                  <div className="bg-white rounded-[32px] p-6 border border-slate-200/80 mb-6 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div
+                        className="w-13 h-13 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs"
+                        style={{ background: selectedCategoryForQuestions.bg, color: selectedCategoryForQuestions.color }}
+                      >
+                        <CategoryIcon id={selectedCategoryForQuestions.id} size={26} />
+                      </div>
+                      <div>
+                        <div className="inline-flex items-center gap-2 mb-1">
+                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Interview Track</span>
+                        </div>
+                        <h2 className="text-[22px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                          {selectedCategoryForQuestions.name} Questions
+                        </h2>
+                        <p className="text-[13px] text-slate-400 mt-0.5">
+                          {selectedCategoryForQuestions.description}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-[13px] font-bold text-[#0066FF] bg-blue-50 px-3.5 py-1.5 rounded-full">
+                        {(questionsMap[selectedCategoryForQuestions.id] || []).length} questions
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Questions List */}
+                  <div className="space-y-4">
+                    {(questionsMap[selectedCategoryForQuestions.id] || []).map((q, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-white rounded-[24px] p-6 border border-slate-200/80 shadow-2xs hover:border-[#0066FF]/40 transition-all"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                Question #{idx + 1}
+                              </span>
+                              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                {q.type}
+                              </span>
+                            </div>
+                            <h4 className="text-[15px] font-semibold text-[#0F172A] leading-snug">
+                              {q.question}
+                            </h4>
+                            {q.hint && (
+                              <div className="mt-2.5 text-[12.5px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span className="font-semibold text-slate-700">Hint:</span> {q.hint}
+                              </div>
+                            )}
+                            {q.feedback && (
+                              <div className="mt-2 text-[12px] text-blue-700 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                                <span className="font-semibold text-blue-900">AI Evaluation Rubric:</span> {q.feedback}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditQuestion(idx, q)}
+                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0066FF] flex items-center justify-center transition-colors cursor-pointer"
+                              title="Edit Question"
+                            >
+                              <EditIcon size={14} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteQuestion(idx)}
+                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+                              title="Delete Question"
+                            >
+                              <TrashIcon size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {(!questionsMap[selectedCategoryForQuestions.id] ||
+                      questionsMap[selectedCategoryForQuestions.id].length === 0) && (
+                      <div className="text-center py-12 bg-white rounded-[24px] border border-slate-200 text-slate-400 text-[14px]">
+                        No questions in this category yet. Click &quot;Add Question&quot; above to create one.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Category List Overview */
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <p className="text-[13.5px] text-slate-500">
+                        Select a category to view and customize its question sets, or add a new category.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleOpenAddCategory}
+                      className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98"
+                    >
+                      <PlusIcon size={16} />
+                      <span>Add Category</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {categories.map((cat) => (
+                      <CategoryCard
+                        key={cat.id}
+                        category={cat}
+                        pipeline={getCategoryPipeline(cat.id)}
+                        questionCount={(questionsMap[cat.id] || []).length}
+                        isAdmin={true}
+                        onEdit={handleOpenEditCategory}
+                        onDelete={handleDeleteCategory}
+                        onManageQuestions={setSelectedCategoryForQuestions}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+        </main>
+      </div>
+
+      {/* ════════════════════ MODALS ════════════════════ */}
+
+      {/* ── Add / Edit Company Modal ── */}
+      {isCompanyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[32px] w-full max-w-[620px] p-7 shadow-2xl border border-slate-100 my-8">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                {editingCompany ? "Edit Industry Partner" : "Add Industry Partner"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsCompanyModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <XIcon />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCompany} className="space-y-4">
+              {/* Cover photo preview & Crop action */}
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-2">
+                  Company Cover Photo (600×260)
+                </label>
+                <div className="relative rounded-2xl overflow-hidden aspect-[600/260] bg-slate-100 border border-slate-200 mb-2">
+                  <img
+                    src={compForm.image}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center gap-3 opacity-0 hover:opacity-100 transition-opacity">
+                    <label className="px-3.5 py-1.5 bg-white rounded-full text-[12px] font-semibold text-[#0066FF] shadow-sm cursor-pointer hover:bg-slate-50">
+                      Upload File
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setCropModalSrc(compForm.image || null)}
+                      className="px-3.5 py-1.5 bg-white rounded-full text-[12px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <CropIcon size={14} />
+                      <span>Crop Photo</span>
+                    </button>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Or enter Image URL"
+                  value={compForm.image}
+                  onChange={(e) => setCompForm({ ...compForm, image: e.target.value })}
+                  className="w-full text-[12.5px] px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Company Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={compForm.name}
+                    onChange={(e) => setCompForm({ ...compForm, name: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Industry</label>
+                  <input
+                    type="text"
+                    value={compForm.industry}
+                    onChange={(e) => setCompForm({ ...compForm, industry: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={compForm.location}
+                    onChange={(e) => setCompForm({ ...compForm, location: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Available Slots</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={compForm.slots}
+                    onChange={(e) => setCompForm({ ...compForm, slots: parseInt(e.target.value) || 0 })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Website</label>
+                  <input
+                    type="text"
+                    value={compForm.website}
+                    onChange={(e) => setCompForm({ ...compForm, website: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={compForm.email}
+                    onChange={(e) => setCompForm({ ...compForm, email: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              {/* Specializations / Categories pills */}
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1.5">
+                  Target Niches / Specializations (Select all that apply)
+                </label>
+                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  {ALL_SPECIALIZATIONS.map((spec) => {
+                    const isSelected = (compForm.specializations || []).includes(spec);
+                    return (
+                      <button
+                        key={spec}
+                        type="button"
+                        onClick={() => toggleSpec(spec)}
+                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#0066FF] text-white"
+                            : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300"
+                        }`}
+                      >
+                        {spec} {isSelected && "✓"}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Description</label>
+                <textarea
+                  rows={2}
+                  value={compForm.description}
+                  onChange={(e) => setCompForm({ ...compForm, description: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl p-3 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCompanyModalOpen(false)}
+                  className="flex-1 py-3 border border-slate-200 text-slate-600 text-[13.5px] font-semibold rounded-full hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold rounded-full shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                >
+                  Save Partner
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Image Crop Modal Trigger ── */}
+      {cropModalSrc && (
+        <ImageCropperModal
+          imageSrc={cropModalSrc}
+          onApply={(cropped) => setCompForm({ ...compForm, image: cropped })}
+          onClose={() => setCropModalSrc(null)}
+        />
+      )}
+
+      {/* ── Add / Edit Student Modal ── */}
+      {isStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[32px] w-full max-w-[500px] p-7 shadow-2xl border border-slate-100 my-8">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                {editingStudent ? "Edit Student Record" : "Enroll Student to DCISM Database"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsStudentModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <XIcon />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveStudent} className="space-y-4">
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Student ID (2XXXXXXX)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 2021-00123"
+                  value={studForm.id}
+                  onChange={(e) => setStudForm({ ...studForm, id: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] font-mono outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Ishie"
+                    value={studForm.firstName}
+                    onChange={(e) => setStudForm({ ...studForm, firstName: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Boo"
+                    value={studForm.lastName}
+                    onChange={(e) => setStudForm({ ...studForm, lastName: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Degree Program</label>
+                <select
+                  value={studForm.course}
+                  onChange={(e) => setStudForm({ ...studForm, course: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF] bg-white cursor-pointer"
+                >
+                  <option value="BS Computer Science">BS Computer Science</option>
+                  <option value="BS Information Technology">BS Information Technology</option>
+                  <option value="BS Information Systems">BS Information Systems</option>
+                  <option value="BS Computer Engineering">BS Computer Engineering</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Year Level</label>
+                <select
+                  value={studForm.yearLevel}
+                  onChange={(e) => setStudForm({ ...studForm, yearLevel: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF] bg-white cursor-pointer"
+                >
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                </select>
+              </div>
+
+              {/* Password Formula Box */}
+              <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl">
+                <div className="text-[11.5px] font-semibold text-blue-800 mb-1">
+                  Default Pre-filled Password:
+                </div>
+                <code className="text-[13px] font-mono font-bold text-[#0066FF]">
+                  {studForm.id && studForm.firstName
+                    ? generateDefaultPassword(studForm.id, studForm.firstName)
+                    : "idnumber_firstname"}
+                </code>
+                <div className="text-[11px] text-slate-400 mt-1">
+                  Students can change this password upon login via Forgot Password.
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsStudentModalOpen(false)}
+                  className="flex-1 py-3 border border-slate-200 text-slate-600 text-[13.5px] font-semibold rounded-full hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold rounded-full shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                >
+                  Save Student
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Add / Edit Category Modal ── */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[32px] w-full max-w-[500px] p-7 shadow-2xl border border-slate-100 my-8">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                {editingCategory ? "Edit Interview Category" : "Add Interview Category"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsCategoryModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <XIcon />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCategory} className="space-y-4">
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Category Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. AI & Machine Learning"
+                  value={catForm.name}
+                  onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Domain Keywords / Summary</label>
+                <input
+                  type="text"
+                  placeholder="e.g. PyTorch, Transformers, LLMs, Computer Vision"
+                  value={catForm.description}
+                  onChange={(e) => setCatForm({ ...catForm, description: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Accent Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={catForm.color}
+                      onChange={(e) => setCatForm({ ...catForm, color: e.target.value })}
+                      className="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={catForm.color}
+                      onChange={(e) => setCatForm({ ...catForm, color: e.target.value })}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-[12.5px] font-mono"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Badge Background</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={catForm.bg}
+                      onChange={(e) => setCatForm({ ...catForm, bg: e.target.value })}
+                      className="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={catForm.bg}
+                      onChange={(e) => setCatForm({ ...catForm, bg: e.target.value })}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-[12.5px] font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="flex-1 py-3 border border-slate-200 text-slate-600 text-[13.5px] font-semibold rounded-full hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold rounded-full shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                >
+                  Save Category
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Add / Edit Question Modal ── */}
+      {isQuestionModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[32px] w-full max-w-[560px] p-7 shadow-2xl border border-slate-100 my-8">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                {editingQuestionIdx !== null ? "Edit Question" : "Add New Question"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsQuestionModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <XIcon />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveQuestion} className="space-y-4">
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Question Type</label>
+                <select
+                  value={questionForm.type}
+                  onChange={(e) => setQuestionForm({ ...questionForm, type: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF] bg-white cursor-pointer"
+                >
+                  <option value="Technical">Technical</option>
+                  <option value="Behavioral">Behavioral</option>
+                  <option value="Situational">Situational</option>
+                  <option value="Coding">Coding</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Question Prompt</label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Type the question interviewer will ask..."
+                  value={questionForm.question}
+                  onChange={(e) => setQuestionForm({ ...questionForm, question: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl p-3 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Candidate Hint / Guidance</label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Use the STAR method: Situation, Task, Action, Result..."
+                  value={questionForm.hint}
+                  onChange={(e) => setQuestionForm({ ...questionForm, hint: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl p-3 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">AI Evaluation Rubric & Expected Key Points</label>
+                <textarea
+                  rows={3}
+                  placeholder="Explain what a strong response should cover for the AI to score..."
+                  value={questionForm.feedback}
+                  onChange={(e) => setQuestionForm({ ...questionForm, feedback: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl p-3 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsQuestionModalOpen(false)}
+                  className="flex-1 py-3 border border-slate-200 text-slate-600 text-[13.5px] font-semibold rounded-full hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold rounded-full shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                >
+                  Save Question
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
