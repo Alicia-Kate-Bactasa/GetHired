@@ -1,5 +1,55 @@
 # GetHired
 
+## Developer Setup Guide
+
+Follow these steps to get the project up and running on your local machine.
+
+### Prerequisites
+
+Ensure you have the following installed:
+- **Node.js** (v18.17+ or v20+ recommended)
+- **npm** (bundled with Node.js) or your preferred package manager
+- **Git**
+
+### Installation & Getting Started
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Alicia-Kate-Bactasa/GetHired.git
+   cd GetHired
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to view the app. Hot reload is enabled, so changes in `src/` will reflect immediately.
+
+### Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Runs the Next.js development server at `http://localhost:3000` |
+| `npm run build` | Compiles and builds the production application |
+| `npm run start` | Starts the production server after building |
+| `npm run format` | Checks and formats source code with `oxfmt` |
+
+### Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **UI Library:** React 19
+- **Styling:** Tailwind CSS v4
+- **Language:** TypeScript
+
+---
+
 ### The Problem
 
 Although DCISM provides a list of industry partners, students may still find it difficult to determine which companies best match their interests, skills, and practicum requirements. Students often need to research companies individually and may also lack sufficient preparation for the interview process.
