@@ -417,7 +417,7 @@ function HomeView({
       </div>
 
       {/* Quick stats — always first */}
-      <div className="grid grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 mb-8 sm:mb-10">
         {[
           { label: "Industry Partners",    value: companies.length,           Icon: <BuildingIcon size={20} /> },
           { label: "Saved Companies",      value: saved.length,               Icon: <BookmarkIcon filled={true} size={20} /> },
@@ -670,26 +670,26 @@ function ExploreView({
   return (
     <div>
       {/* Search bar + Filter button */}
-      <div className="flex gap-3 mb-4">
-        <div className="flex-1 bg-white rounded-[45px] shadow-sm border border-gray-100 px-6 py-3.5 flex items-center gap-3">
-          <span className="text-gray-300"><SearchIcon /></span>
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <div className="flex-1 bg-white rounded-[45px] shadow-sm border border-gray-100 px-5 sm:px-6 py-3 sm:py-3.5 flex items-center gap-3">
+          <span className="text-gray-300 shrink-0"><SearchIcon /></span>
           <input
             type="text"
             placeholder="Search companies, specializations, or locations..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 outline-none text-[14px] text-gray-600 placeholder-gray-300"
+            className="flex-1 outline-none text-[13.5px] sm:text-[14px] text-gray-600 placeholder-gray-300 min-w-0"
             style={{ fontFamily: "'Poppins', sans-serif" }}
           />
           {search && (
-            <button onClick={() => setSearch("")} className="text-gray-300 hover:text-gray-500 text-xl leading-none">×</button>
+            <button onClick={() => setSearch("")} className="text-gray-300 hover:text-gray-500 text-xl leading-none cursor-pointer">×</button>
           )}
         </div>
 
         {/* Filter button */}
         <button
           onClick={() => setFilterOpen(true)}
-          className={`relative flex items-center gap-2 px-5 rounded-[45px] border font-medium text-[13px] transition-all shadow-sm ${
+          className={`relative flex items-center justify-center gap-2 px-5 py-3 sm:py-0 rounded-[45px] border font-medium text-[13px] transition-all shadow-sm shrink-0 cursor-pointer ${
             filterCount > 0
               ? "bg-[#0073ff] text-white border-[#0073ff]"
               : "bg-white text-gray-500 border-gray-100 hover:border-[#0073ff] hover:text-[#0073ff]"
@@ -1221,9 +1221,9 @@ export default function Dashboard({ onLogout }: Props = {}) {
   return (
     <div className="h-screen flex bg-[#f5f7ff] overflow-hidden" style={{ fontFamily: "'Poppins', sans-serif" }}>
 
-      {/* ═══ Sidebar ═══ */}
+      {/* ═══ Desktop Sidebar ═══ */}
       <div
-        className="p-3 shrink-0 flex flex-col"
+        className="hidden md:flex p-3 shrink-0 flex-col"
         style={{ transition: "width 260ms cubic-bezier(.4,0,.2,1)", width: collapsed ? 88 : 258 }}
       >
         <aside className={`bg-white rounded-[36px] flex flex-col py-6 overflow-hidden h-full shadow-sm border border-gray-100 ${collapsed ? "px-2.5" : ""}`}>
@@ -1293,13 +1293,25 @@ export default function Dashboard({ onLogout }: Props = {}) {
 
       {/* ═══ Main ═══ */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-end px-7 pt-5 pb-3 shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-7 pt-4 sm:pt-5 pb-3 shrink-0">
+          {/* Mobile brand header */}
+          <div className="flex items-center gap-2 md:hidden">
+            <img
+              src="/getHiredLogo.PNG"
+              alt="GetHired Logo"
+              className="w-8 h-8 object-contain shrink-0"
+            />
+            <span className="text-[20px] font-bold text-[#0066FF]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+              GetHired
+            </span>
+          </div>
+
           <button
             onClick={() => setProfileOpen(true)}
-            className="flex items-center gap-3 bg-white rounded-[40px] pl-1.5 pr-4 py-1.5 shadow-sm border border-gray-100 hover:border-[#b8d0ff] transition-all"
+            className="flex items-center gap-2.5 sm:gap-3 bg-white rounded-[40px] pl-1.5 pr-3.5 sm:pr-4 py-1.5 shadow-sm border border-gray-100 hover:border-[#b8d0ff] transition-all ml-auto cursor-pointer"
           >
-            <div className="w-[42px] h-[42px] bg-[#5462ff] rounded-full flex items-center justify-center shadow-sm shrink-0">
-              <span className="text-white text-[13px] font-bold tracking-wide leading-none">
+            <div className="w-[38px] sm:w-[42px] h-[38px] sm:h-[42px] bg-[#5462ff] rounded-full flex items-center justify-center shadow-sm shrink-0">
+              <span className="text-white text-[12px] sm:text-[13px] font-bold tracking-wide leading-none">
                 {profile.name.split(" ").map((w) => w.charAt(0)).join("").slice(0, 2).toUpperCase()}
               </span>
             </div>
@@ -1310,12 +1322,41 @@ export default function Dashboard({ onLogout }: Props = {}) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-7 pb-7">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-7 pb-24 md:pb-7">
           {view === "home"      && <HomeView companies={companies} onToggleSave={toggleSave} onViewMore={setSelectedCompany} />}
           {view === "explore"   && <ExploreView companies={companies} onToggleSave={toggleSave} onViewMore={setSelectedCompany} />}
           {view === "interview" && <InterviewView />}
         </div>
       </div>
+
+      {/* ═══ Mobile Bottom Navigation Bar ═══ */}
+      <nav aria-label="Mobile Navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-3 py-1.5 flex items-center justify-around shadow-lg">
+        {navItems.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            onClick={() => setView(id)}
+            className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl text-[11px] font-medium transition-all ${
+              view === id
+                ? "text-[#0073ff] font-semibold"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            <div className={`p-1 rounded-xl transition-all ${view === id ? "bg-[#0073ff]/10 text-[#0073ff]" : ""}`}>
+              <Icon />
+            </div>
+            <span>{label}</span>
+          </button>
+        ))}
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl text-[11px] font-medium text-slate-400 hover:text-red-500 transition-all cursor-pointer"
+        >
+          <div className="p-1">
+            <LogOutIcon />
+          </div>
+          <span>Logout</span>
+        </button>
+      </nav>
 
       {selectedCompany && (
         <CompanyModal

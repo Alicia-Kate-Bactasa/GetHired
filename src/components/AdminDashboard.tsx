@@ -89,6 +89,14 @@ const CropIcon = ({ size = 16 }: { size?: number }) => (
   </svg>
 );
 
+const UploadIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
 const CopyIcon = ({ size = 13 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -508,7 +516,7 @@ export default function AdminDashboard() {
     email: "",
     phone: "",
     hours: "Mon – Fri, 8:00 AM – 5:00 PM",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=260&fit=crop&auto=format",
+    image: "",
     specializations: ["Software Dev"],
   });
 
@@ -660,7 +668,7 @@ export default function AdminDashboard() {
       email: "",
       phone: "+63 32 412 8888",
       hours: "Mon – Fri, 9:00 AM – 6:00 PM",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=260&fit=crop&auto=format",
+      image: "",
       specializations: ["Software Dev", "React / Node.js"],
     });
     setIsCompanyModalOpen(true);
@@ -941,9 +949,9 @@ export default function AdminDashboard() {
   return (
     <div className="h-screen flex bg-[#f5f7ff] overflow-hidden text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
 
-      {/* ═══ ADMIN SIDEBAR ═══ */}
+      {/* ═══ ADMIN SIDEBAR (Desktop) ═══ */}
       <div
-        className="p-3 shrink-0 flex flex-col transition-all duration-300"
+        className="hidden md:flex p-3 shrink-0 flex-col transition-all duration-300"
         style={{ width: collapsed ? 88 : 260 }}
       >
         <aside className={`bg-white rounded-[36px] flex flex-col py-6 overflow-hidden h-full shadow-sm border border-slate-100 ${collapsed ? "px-2.5" : ""}`}>
@@ -1011,8 +1019,6 @@ export default function AdminDashboard() {
             ))}
           </nav>
 
-
-
           {/* Centered Logout */}
           <div className="px-2 flex justify-center">
             <button
@@ -1031,18 +1037,26 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         
         {/* Top Header */}
-        <header className="flex items-center justify-between px-8 py-5 shrink-0 border-b border-slate-200/70 bg-white/70 backdrop-blur-xs">
-          <div>
-            <h1 className="text-[26px] font-bold text-[#0F172A] tracking-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
-              {activeTab === "companies" && "Industry Partner Directory"}
+        <header className="flex items-center justify-between px-4 sm:px-8 py-3.5 sm:py-5 shrink-0 border-b border-slate-200/70 bg-white/70 backdrop-blur-xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Mobile logo icon */}
+            <div className="flex items-center gap-1.5 md:hidden shrink-0">
+              <img
+                src="/getHiredLogo.PNG"
+                alt="GetHired Logo"
+                className="w-7 h-7 object-contain"
+              />
+            </div>
+            <h1 className="text-[17px] sm:text-[22px] lg:text-[26px] font-bold text-[#0F172A] tracking-tight truncate" style={{ fontFamily: "'DM Serif Display', serif" }}>
+              {activeTab === "companies" && "Industry Partners"}
               {activeTab === "students" && "DCISM Student Registry"}
-              {activeTab === "interviews" && "Interview Categories & Question Bank"}
+              {activeTab === "interviews" && (selectedCategoryForQuestions ? `${selectedCategoryForQuestions.name} Questions` : "Interview Categories")}
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2.5 bg-white border border-slate-200/90 rounded-full pl-1.5 pr-4 py-1.5 shadow-2xs">
-              <div className="w-8 h-8 rounded-full bg-[#0066FF] text-white font-bold text-[13px] flex items-center justify-center">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-2 bg-white border border-slate-200/90 rounded-full pl-1.5 pr-3 sm:pr-4 py-1.5 shadow-2xs">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#0066FF] text-white font-bold text-[12px] sm:text-[13px] flex items-center justify-center">
                 A
               </div>
               <div className="text-left leading-tight hidden sm:block">
@@ -1053,7 +1067,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* Content Body */}
-        <main className={`flex-1 px-8 py-6 ${activeTab === "students" ? "overflow-hidden flex flex-col" : "overflow-y-auto"}`}>
+        <main className={`flex-1 px-4 sm:px-8 py-4 sm:py-6 pb-24 md:pb-6 ${activeTab === "students" ? "overflow-hidden flex flex-col" : "overflow-y-auto"}`}>
 
           {/* ════════════════════ TAB 1: COMPANIES ════════════════════ */}
           {activeTab === "companies" && (
@@ -1404,7 +1418,7 @@ export default function AdminDashboard() {
               ) : (
                 /* Category List Overview */
                 <div>
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
                     <div>
                       <p className="text-[13.5px] text-slate-500">
                         Select a category to view and customize its question sets, or add a new category.
@@ -1413,7 +1427,7 @@ export default function AdminDashboard() {
                     <button
                       type="button"
                       onClick={handleOpenAddCategory}
-                      className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98"
+                      className="inline-flex items-center justify-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98 shrink-0"
                     >
                       <PlusIcon size={16} />
                       <span>Add Category</span>
@@ -1443,12 +1457,53 @@ export default function AdminDashboard() {
         </main>
       </div>
 
+      {/* ═══ Mobile Bottom Admin Navigation Bar ═══ */}
+      <nav aria-label="Admin Mobile Navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-1.5 flex items-center justify-around shadow-lg">
+        {[
+          { id: "companies",  label: "Companies",  badge: companies.length, Icon: BuildingIcon },
+          { id: "students",   label: "Students",   badge: students.length,  Icon: UsersIcon },
+          { id: "interviews", label: "Interviews", badge: categories.length, Icon: MicIcon },
+        ].map(({ id, label, badge, Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => {
+              setActiveTab(id as AdminTab);
+              setSelectedCategoryForQuestions(null);
+            }}
+            className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl text-[11px] font-medium transition-all relative ${
+              activeTab === id
+                ? "text-[#0066FF] font-semibold"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            <div className={`p-1 rounded-xl transition-all relative ${activeTab === id ? "bg-[#0066FF]/10 text-[#0066FF]" : ""}`}>
+              <Icon size={18} />
+              <span className="absolute -top-1 -right-1.5 bg-slate-200 text-slate-700 text-[9px] font-bold px-1 rounded-full leading-tight">
+                {badge}
+              </span>
+            </div>
+            <span>{label}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => router.push("/login")}
+          className="flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl text-[11px] font-medium text-slate-400 hover:text-red-500 transition-all cursor-pointer"
+        >
+          <div className="p-1">
+            <LogOutIcon />
+          </div>
+          <span>Logout</span>
+        </button>
+      </nav>
+
       {/* ════════════════════ MODALS ════════════════════ */}
 
       {/* ── Add / Edit Company Modal ── */}
       {isCompanyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-[32px] w-full max-w-[620px] p-7 shadow-2xl border border-slate-100 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[28px] sm:rounded-[32px] w-full max-w-[620px] p-5 sm:p-7 shadow-2xl border border-slate-100 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
                 {editingCompany ? "Edit Industry Partner" : "Add Industry Partner"}
@@ -1463,47 +1518,88 @@ export default function AdminDashboard() {
             </div>
 
             <form onSubmit={handleSaveCompany} className="space-y-4">
-              {/* Cover photo preview & Crop action */}
+              {/* Cover photo upload / preview & Crop action */}
               <div>
                 <label className="block text-[12.5px] font-semibold text-slate-700 mb-2">
                   Company Cover Photo (600×260)
                 </label>
-                <div className="relative rounded-2xl overflow-hidden aspect-[600/260] bg-slate-100 border border-slate-200 mb-2">
-                  <img
-                    src={compForm.image}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center gap-3 opacity-0 hover:opacity-100 transition-opacity">
-                    <label className="px-3.5 py-1.5 bg-white rounded-full text-[12px] font-semibold text-[#0066FF] shadow-sm cursor-pointer hover:bg-slate-50">
-                      Upload File
+
+                {compForm.image ? (
+                  <div className="space-y-2">
+                    <div className="relative rounded-2xl overflow-hidden aspect-[600/260] bg-slate-100 border border-slate-200 group">
+                      <img
+                        src={compForm.image}
+                        alt="Company Cover Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 sm:bg-black/30 sm:opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2 flex-wrap">
+                        <label className="px-3 py-1.5 bg-white rounded-full text-[12px] font-semibold text-[#0066FF] shadow-sm cursor-pointer hover:bg-slate-50 flex items-center gap-1.5 transition-colors active:scale-95">
+                          <UploadIcon size={13} />
+                          <span>Change Photo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setCropModalSrc(compForm.image || null)}
+                          className="px-3 py-1.5 bg-white rounded-full text-[12px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
+                        >
+                          <CropIcon size={13} />
+                          <span>Crop</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCompForm({ ...compForm, image: "" })}
+                          className="px-3 py-1.5 bg-white rounded-full text-[12px] font-semibold text-red-600 shadow-sm hover:bg-red-50 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
+                        >
+                          <TrashIcon size={13} />
+                          <span>Remove</span>
+                        </button>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Or enter Image URL"
+                      value={compForm.image}
+                      onChange={(e) => setCompForm({ ...compForm, image: e.target.value })}
+                      className="w-full text-[12px] px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-[#0066FF] text-slate-700"
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="relative rounded-2xl border-2 border-dashed border-slate-200 hover:border-[#0066FF]/60 bg-slate-50/70 hover:bg-blue-50/30 aspect-[600/220] sm:aspect-[600/200] flex flex-col items-center justify-center p-4 cursor-pointer transition-all group">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileUpload}
                         className="hidden"
                       />
+                      <div className="w-11 h-11 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-center text-[#0066FF] group-hover:scale-105 group-hover:border-blue-200 transition-all mb-2.5">
+                        <UploadIcon size={20} />
+                      </div>
+                      <p className="text-[13.5px] font-semibold text-slate-700 group-hover:text-[#0066FF] transition-colors">
+                        Upload Photo
+                      </p>
+                      <p className="text-[11.5px] text-slate-400 mt-0.5 text-center">
+                        Click to browse file <span className="hidden sm:inline">(600×260 recommended)</span>
+                      </p>
                     </label>
-                    <button
-                      type="button"
-                      onClick={() => setCropModalSrc(compForm.image || null)}
-                      className="px-3.5 py-1.5 bg-white rounded-full text-[12px] font-semibold text-slate-700 shadow-sm hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <CropIcon size={14} />
-                      <span>Crop Photo</span>
-                    </button>
+                    <input
+                      type="text"
+                      placeholder="Or enter Image URL"
+                      value={compForm.image || ""}
+                      onChange={(e) => setCompForm({ ...compForm, image: e.target.value })}
+                      className="w-full text-[12px] px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-[#0066FF] placeholder:text-slate-400 text-slate-700"
+                    />
                   </div>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Or enter Image URL"
-                  value={compForm.image}
-                  onChange={(e) => setCompForm({ ...compForm, image: e.target.value })}
-                  className="w-full text-[12.5px] px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-[#0066FF]"
-                />
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Company Name</label>
                   <input
@@ -1623,8 +1719,8 @@ export default function AdminDashboard() {
 
       {/* ── Add / Edit Student Modal ── */}
       {isStudentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-[32px] w-full max-w-[500px] p-7 shadow-2xl border border-slate-100 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[28px] sm:rounded-[32px] w-full max-w-[500px] p-5 sm:p-7 shadow-2xl border border-slate-100 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
                 {editingStudent ? "Edit Student Record" : "Enroll Student to DCISM Database"}
@@ -1651,7 +1747,7 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">First Name</label>
                   <input
@@ -1736,8 +1832,8 @@ export default function AdminDashboard() {
 
       {/* ── Add / Edit Category Modal ── */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-[32px] w-full max-w-[500px] p-7 shadow-2xl border border-slate-100 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[28px] sm:rounded-[32px] w-full max-w-[500px] p-5 sm:p-7 shadow-2xl border border-slate-100 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
                 {editingCategory ? "Edit Interview Category" : "Add Interview Category"}
@@ -1775,7 +1871,7 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Accent Color</label>
                   <div className="flex items-center gap-2">
@@ -1834,8 +1930,8 @@ export default function AdminDashboard() {
 
       {/* ── Add / Edit Question Modal ── */}
       {isQuestionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-[32px] w-full max-w-[560px] p-7 shadow-2xl border border-slate-100 my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-[28px] sm:rounded-[32px] w-full max-w-[560px] p-5 sm:p-7 shadow-2xl border border-slate-100 my-auto max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[20px] font-bold text-[#0F172A]" style={{ fontFamily: "'DM Serif Display', serif" }}>
                 {editingQuestionIdx !== null ? "Edit Question" : "Add New Question"}
@@ -1916,11 +2012,11 @@ export default function AdminDashboard() {
       {/* ── Confirmation Modal (Deactivate / Reactivate / Delete) ── */}
       {confirmModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/45 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/45 backdrop-blur-xs"
           onClick={() => setConfirmModal(null)}
         >
           <div
-            className="bg-white rounded-[32px] w-full max-w-md shadow-2xl p-7 text-left border border-slate-100"
+            className="bg-white rounded-[28px] sm:rounded-[32px] w-full max-w-md shadow-2xl p-5 sm:p-7 text-left border border-slate-100 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start gap-4">

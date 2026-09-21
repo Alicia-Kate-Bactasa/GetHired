@@ -128,11 +128,20 @@ export default function CompanyCard({
     >
       {/* Card Image Banner */}
       <div className="relative h-[140px] bg-slate-100 overflow-hidden shrink-0">
-        <img
-          src={company.image}
-          alt={company.name}
-          className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
-        />
+        {company.image ? (
+          <img
+            src={company.image}
+            alt={company.name}
+            className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full bg-linear-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-slate-300">
+            <svg width={36} height={36} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#0066FF]/40">
+              <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+              <path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
+            </svg>
+          </div>
+        )}
 
         {company.deactivated && (
           <span className="absolute top-3 left-3 bg-amber-500 text-white text-[10.5px] font-bold px-2.5 py-0.5 rounded-full shadow-xs uppercase tracking-wider backdrop-blur-xs">
