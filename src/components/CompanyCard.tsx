@@ -103,9 +103,26 @@ export default function CompanyCard({
   onDeactivate,
   onReactivate,
 }: CompanyCardProps) {
+  const handleCardClick = () => {
+    if (onViewMore) {
+      onViewMore(company);
+    } else if (isAdmin && onEdit) {
+      onEdit(company);
+    }
+  };
+
   return (
     <div
-      className={`bg-white rounded-[32px] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-slate-100 hover:border-slate-200/80 h-full group ${
+      onClick={handleCardClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleCardClick();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      className={`bg-white rounded-[32px] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-slate-100 hover:border-slate-200/80 h-full group cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-[#0066FF] ${
         company.deactivated ? "opacity-75 bg-slate-50/50" : ""
       }`}
     >
@@ -238,7 +255,10 @@ export default function CompanyCard({
               {company.deactivated ? (
                 <button
                   type="button"
-                  onClick={() => onReactivate?.(company)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReactivate?.(company);
+                  }}
                   className="text-[11.5px] font-bold text-emerald-600 hover:underline cursor-pointer"
                 >
                   Reactivate Company
@@ -246,7 +266,10 @@ export default function CompanyCard({
               ) : (
                 <button
                   type="button"
-                  onClick={() => onEdit?.(company)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(company);
+                  }}
                   className="text-[11.5px] font-semibold text-[#0066FF] hover:underline cursor-pointer"
                 >
                   Edit Company →
@@ -255,7 +278,10 @@ export default function CompanyCard({
               {onViewMore && (
                 <button
                   type="button"
-                  onClick={() => onViewMore(company)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewMore(company);
+                  }}
                   className="text-[11px] text-slate-400 hover:text-[#0066FF] transition-colors cursor-pointer"
                 >
                   preview card
@@ -266,8 +292,11 @@ export default function CompanyCard({
             <div className="w-full flex justify-end">
               <button
                 type="button"
-                onClick={() => onViewMore?.(company)}
-                className="text-[11px] text-gray-300 hover:text-[#0073ff] transition-colors cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewMore?.(company);
+                }}
+                className="text-[11px] text-gray-400 hover:text-[#0073ff] font-medium transition-colors cursor-pointer"
               >
                 know more →
               </button>
