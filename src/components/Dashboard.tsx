@@ -521,7 +521,7 @@ const NICHES: { label: string; match: (c: Company) => boolean }[] = [
 ];
 
 /* ═══════════════════════════════ FILTER MODAL ═══════════════════════ */
-interface ActiveFilters { specializations: string[]; hasSlots: boolean; }
+interface ActiveFilters { specializations: string[]; }
 
 function FilterModal({
   companies,
@@ -545,7 +545,7 @@ function FilterModal({
         : [...prev.specializations, s],
     }));
 
-  const clear = () => setDraft({ specializations: [], hasSlots: false });
+  const clear = () => setDraft({ specializations: [] });
 
   return (
     <div
@@ -568,7 +568,7 @@ function FilterModal({
         </div>
 
         {/* Specializations */}
-        <div className="mb-6">
+        <div className="mb-7">
           <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
             Specialization
           </div>
@@ -587,28 +587,6 @@ function FilterModal({
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Availability toggle */}
-        <div className="mb-7">
-          <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
-            Availability
-          </div>
-          <button
-            onClick={() => setDraft((prev) => ({ ...prev, hasSlots: !prev.hasSlots }))}
-            className={`flex items-center gap-3 px-5 py-3 rounded-[18px] border text-[13px] font-medium transition-all ${
-              draft.hasSlots
-                ? "bg-[#dfe9ff] border-[#0073ff] text-[#0073ff]"
-                : "border-gray-200 text-gray-500 hover:border-[#0073ff] hover:text-[#0073ff]"
-            }`}
-          >
-            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-              draft.hasSlots ? "border-[#0073ff] bg-[#0073ff]" : "border-gray-300"
-            }`}>
-              {draft.hasSlots && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-            </div>
-            Has open OJT slots
-          </button>
         </div>
 
         {/* Actions */}
@@ -644,9 +622,9 @@ function ExploreView({
   const [search, setSearch]           = useState("");
   const [activeNiche, setActiveNiche] = useState("All");
   const [filterOpen, setFilterOpen]   = useState(false);
-  const [activeFilters, setActiveFilters] = useState<ActiveFilters>({ specializations: [], hasSlots: false });
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>({ specializations: [] });
 
-  const filterCount = activeFilters.specializations.length + (activeFilters.hasSlots ? 1 : 0);
+  const filterCount = activeFilters.specializations.length;
 
   const nicheMatch = NICHES.find((n) => n.label === activeNiche)?.match ?? (() => true);
 
@@ -661,11 +639,10 @@ function ExploreView({
     const matchNiche = nicheMatch(c);
     const matchSpec  = activeFilters.specializations.length === 0 ||
       c.specializations.some((s) => activeFilters.specializations.includes(s));
-    const matchSlots = !activeFilters.hasSlots || c.slots > 0;
-    return matchSearch && matchNiche && matchSpec && matchSlots;
+    return matchSearch && matchNiche && matchSpec;
   });
 
-  const clearAll = () => { setSearch(""); setActiveNiche("All"); setActiveFilters({ specializations: [], hasSlots: false }); };
+  const clearAll = () => { setSearch(""); setActiveNiche("All"); setActiveFilters({ specializations: [] }); };
 
   return (
     <div>
