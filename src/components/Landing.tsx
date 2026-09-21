@@ -178,7 +178,7 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
       {/* ══════ 2. FLOATING GLASS NAVBAR (Extra-long full-bleed width, 68px height) ══════ */}
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-3 sm:px-5 pt-5 sm:pt-6 pointer-events-none">
         <nav
-          className="pointer-events-auto w-full max-w-[1520px] h-[68px] rounded-full px-7 sm:px-12 flex items-center justify-between transition-all select-none"
+          className="pointer-events-auto w-full max-w-[1520px] h-[64px] sm:h-[68px] rounded-full px-4 sm:px-8 md:px-12 flex items-center justify-between transition-all select-none"
           style={{
             background: "rgba(255, 255, 255, 0.82)",
             backdropFilter: "blur(20px)",
@@ -190,15 +190,15 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
           {/* Left: Brand title "GetHired" in bold royal blue (#0066FF) */}
           <button
             onClick={() => scrollTo("home")}
-            className="cursor-pointer text-left focus:outline-none flex items-center gap-2.5 group"
+            className="cursor-pointer text-left focus:outline-none flex items-center gap-2 group shrink-0"
           >
             <img
               src="/getHiredLogo.PNG"
               alt="GetHired Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0 group-hover:opacity-90 transition-opacity"
+              className="w-9 h-9 sm:w-12 sm:h-12 object-contain shrink-0 group-hover:opacity-90 transition-opacity"
             />
             <span
-              className="text-[#0066FF] font-bold text-[24px] tracking-tight group-hover:opacity-90 transition-opacity"
+              className="text-[#0066FF] font-bold text-[20px] sm:text-[24px] tracking-tight group-hover:opacity-90 transition-opacity"
               style={{ fontFamily: "'DM Serif Display', serif" }}
             >
               GetHired
@@ -236,7 +236,7 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
           {/* Right: Pill CTA button in solid royal blue (#0066FF), white text "Student Portal", padding: 8px 20px, rounded-full */}
           <button
             onClick={handleLogin}
-            className="bg-[#0066FF] hover:bg-[#0052cc] text-white text-[15px] font-medium px-7 py-2.5 rounded-full transition-all shadow-sm active:scale-95 cursor-pointer"
+            className="bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13px] sm:text-[15px] font-medium px-4 sm:px-7 py-2 sm:py-2.5 rounded-full transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
           >
             Student Portal
           </button>
@@ -712,29 +712,28 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
       </section>
 
       {/* ══════ SECTION 2 — ABOUT ══════ */}
-      <section id="about" className="min-h-screen flex items-center px-8 py-24">
-        <div className="bg-[#dfe9ff] rounded-[45px] w-full p-12 lg:p-16">
+      <section id="about" className="min-h-screen flex items-center px-4 sm:px-8 py-16 sm:py-24 max-w-[1520px] mx-auto w-full">
+        <div className="bg-[#dfe9ff] rounded-[28px] sm:rounded-[40px] lg:rounded-[45px] w-full p-6 sm:p-10 lg:p-16">
 
-          <div className="mb-12">
-            <span className="text-[#0073ff] text-[11px] font-semibold uppercase tracking-[4px] block mb-4">
+          <div className="mb-8 sm:mb-12">
+            <span className="text-[#0073ff] text-[11px] font-semibold uppercase tracking-[3px] sm:tracking-[4px] block mb-3 sm:mb-4">
               About GetHired
             </span>
             <h2
-              className="text-[#302929] leading-tight tracking-[-2px] max-w-3xl mb-5"
+              className="text-[#302929] leading-[1.15] sm:leading-tight tracking-[-1px] sm:tracking-[-2px] max-w-3xl mb-4 sm:mb-5 text-[26px] xs:text-[32px] sm:text-[42px] md:text-[52px] lg:text-[60px] break-words"
               style={{
                 fontFamily: "'DM Serif Display', serif",
-                fontSize: "clamp(36px, 4.5vw, 64px)",
               }}
             >
               Everything you need for your OJT journey.
             </h2>
-            <p className="text-gray-400 text-[17px] max-w-xl leading-relaxed">
+            <p className="text-gray-500 sm:text-gray-400 text-[14.5px] sm:text-[17px] max-w-xl leading-relaxed">
               GetHired handles the research and preparation so you can focus on what
               actually matters — landing the placement you deserve.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {[
               {
                 icon: <IconSearch />,
@@ -754,44 +753,44 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
             ].map((card) => (
               <div
                 key={card.title}
-                className="bg-white rounded-[32px] p-8 hover:shadow-md transition-shadow"
+                className="bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 hover:shadow-md transition-shadow"
               >
-                <div className="text-[#0073ff] mb-5">{card.icon}</div>
+                <div className="text-[#0073ff] mb-4 sm:mb-5">{card.icon}</div>
                 <h3
-                  className="text-[20px] text-[#232323] mb-3"
+                  className="text-[18px] sm:text-[20px] text-[#232323] mb-2 sm:mb-3"
                   style={{ fontFamily: "'DM Serif Text', serif" }}
                 >
                   {card.title}
                 </h3>
-                <p className="text-[14px] text-gray-400 leading-relaxed">{card.body}</p>
+                <p className="text-[13.5px] sm:text-[14px] text-gray-500 sm:text-gray-400 leading-relaxed">{card.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-2 bg-white rounded-[32px] p-8 hover:shadow-md transition-shadow">
-              <div className="text-[#0073ff] mb-5"><IconBookmark /></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="col-span-1 md:col-span-2 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 hover:shadow-md transition-shadow">
+              <div className="text-[#0073ff] mb-4 sm:mb-5"><IconBookmark /></div>
               <h3
-                className="text-[20px] text-[#232323] mb-3"
+                className="text-[18px] sm:text-[20px] text-[#232323] mb-2 sm:mb-3"
                 style={{ fontFamily: "'DM Serif Text', serif" }}
               >
                 Save & Compare Companies
               </h3>
-              <p className="text-[14px] text-gray-400 leading-relaxed max-w-lg">
+              <p className="text-[13.5px] sm:text-[14px] text-gray-500 sm:text-gray-400 leading-relaxed max-w-lg">
                 Bookmark your top picks and compare them side-by-side based on
                 specializations, requirements, and location. Build your shortlist before committing
                 to applications.
               </p>
             </div>
-            <div className="bg-white rounded-[32px] p-8 hover:shadow-md transition-shadow">
-              <div className="text-[#0073ff] mb-5"><IconGraduation /></div>
+            <div className="col-span-1 bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8 hover:shadow-md transition-shadow">
+              <div className="text-[#0073ff] mb-4 sm:mb-5"><IconGraduation /></div>
               <h3
-                className="text-[20px] text-[#232323] mb-3"
+                className="text-[18px] sm:text-[20px] text-[#232323] mb-2 sm:mb-3"
                 style={{ fontFamily: "'DM Serif Text', serif" }}
               >
                 DCISM-Specific
               </h3>
-              <p className="text-[14px] text-gray-400 leading-relaxed">
+              <p className="text-[13.5px] sm:text-[14px] text-gray-500 sm:text-gray-400 leading-relaxed">
                 Built exclusively for DCISM students and their unique practicum requirements
                 and curriculum tracks.
               </p>
@@ -801,21 +800,20 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
       </section>
 
       {/* ══════ SECTION 3 — HOW IT WORKS ══════ */}
-      <section id="how-it-works" className="min-h-screen flex flex-col items-center justify-center px-8 py-24 bg-white">
+      <section id="how-it-works" className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-8 py-16 sm:py-24 bg-white">
         <div className="w-full max-w-[720px]">
-          <span className="text-[#4869ff] text-[11px] font-semibold uppercase tracking-[4px] block text-center mb-4">
+          <span className="text-[#4869ff] text-[11px] font-semibold uppercase tracking-[3px] sm:tracking-[4px] block text-center mb-3 sm:mb-4">
             How It Works
           </span>
           <h2
-            className="text-[#302929] text-center leading-tight tracking-[-2px] mb-4"
+            className="text-[#302929] text-center leading-[1.15] sm:leading-tight tracking-[-1px] sm:tracking-[-2px] mb-3 sm:mb-4 text-[26px] xs:text-[32px] sm:text-[42px] md:text-[52px] break-words"
             style={{
               fontFamily: "'DM Serif Display', serif",
-              fontSize: "clamp(36px, 4.5vw, 64px)",
             }}
           >
             Three steps to your ideal placement.
           </h2>
-          <p className="text-gray-400 text-[16px] text-center mb-16 max-w-md mx-auto leading-relaxed">
+          <p className="text-gray-400 text-[14px] sm:text-[16px] text-center mb-8 sm:mb-16 max-w-md mx-auto leading-relaxed">
             GetHired simplifies the OJT search from discovery to interview preparation.
           </p>
 
@@ -824,30 +822,30 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
               onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
               disabled={currentStep === 0}
               aria-label="Previous step"
-              className="absolute left-[-60px] top-1/2 -translate-y-1/2 w-12 h-12 bg-[#0073ff] rounded-full flex items-center justify-center text-white hover:bg-[#0052cc] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-200 z-10 cursor-pointer"
+              className="hidden sm:flex absolute left-[-60px] top-1/2 -translate-y-1/2 w-12 h-12 bg-[#0073ff] rounded-full items-center justify-center text-white hover:bg-[#0052cc] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-200 z-10 cursor-pointer"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="block -translate-x-[1px]">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
 
-            <div className="bg-[#4869ff] rounded-[45px] overflow-hidden">
-              <div className="bg-white mx-5 mt-5 rounded-[35px] px-6 py-4 flex items-center gap-4">
-                <div className="w-10 h-10 bg-[#4869ff] rounded-full flex items-center justify-center shrink-0 shadow-md">
+            <div className="bg-[#4869ff] rounded-[32px] sm:rounded-[45px] overflow-hidden">
+              <div className="bg-white mx-3 sm:mx-5 mt-3 sm:mt-5 rounded-[22px] sm:rounded-[35px] px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#4869ff] rounded-full flex items-center justify-center shrink-0 shadow-md">
                   <span
-                    className="text-white text-[18px] font-bold"
+                    className="text-white text-[16px] sm:text-[18px] font-bold"
                     style={{ fontFamily: "'DM Serif Display', serif" }}
                   >
                     {steps[currentStep].number}
                   </span>
                 </div>
                 <span
-                  className="text-[#302929] text-[18px] font-semibold"
+                  className="text-[#302929] text-[15px] sm:text-[18px] font-semibold truncate"
                   style={{ fontFamily: "'DM Serif Text', serif" }}
                 >
                   {steps[currentStep].title}
                 </span>
-                <div className="ml-auto flex gap-2">
+                <div className="ml-auto hidden sm:flex gap-2">
                   {steps.map((_, i) => (
                     <button
                       key={i}
@@ -860,15 +858,15 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
                 </div>
               </div>
 
-              <div className="bg-white mx-5 mb-5 mt-4 rounded-[35px] p-10 min-h-[200px] flex flex-col justify-between">
-                <p className="text-[16px] text-gray-500 leading-relaxed">
+              <div className="bg-white mx-3 sm:mx-5 mb-3 sm:mb-5 mt-3 sm:mt-4 rounded-[22px] sm:rounded-[35px] p-5 sm:p-10 min-h-[160px] sm:min-h-[200px] flex flex-col justify-between">
+                <p className="text-[14px] sm:text-[16px] text-gray-500 leading-relaxed">
                   {steps[currentStep].description}
                 </p>
                 {steps[currentStep].number === 3 && (
-                  <div className="mt-6 pt-2">
+                  <div className="mt-5 sm:mt-6 pt-2">
                     <button
                       onClick={handleLogin}
-                      className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold text-[14px] px-6 py-2.5 rounded-full transition-all shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/25 active:scale-98 cursor-pointer group"
+                      className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold text-[13.5px] sm:text-[14px] px-6 py-2.5 rounded-full transition-all shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/25 active:scale-98 cursor-pointer group"
                     >
                       <span>Get started</span>
                       <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -882,10 +880,41 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
               onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
               disabled={currentStep === steps.length - 1}
               aria-label="Next step"
-              className="absolute right-[-60px] top-1/2 -translate-y-1/2 w-12 h-12 bg-[#0073ff] rounded-full flex items-center justify-center text-white text-2xl font-bold hover:bg-[#0052cc] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-200 z-10 cursor-pointer"
+              className="hidden sm:flex absolute right-[-60px] top-1/2 -translate-y-1/2 w-12 h-12 bg-[#0073ff] rounded-full items-center justify-center text-white text-2xl font-bold hover:bg-[#0052cc] hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-200 z-10 cursor-pointer"
             >
               ›
             </button>
+
+            {/* Mobile navigation controls */}
+            <div className="flex items-center justify-between mt-4 sm:hidden px-1">
+              <button
+                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                disabled={currentStep === 0}
+                aria-label="Previous step"
+                className="px-4 py-2 bg-[#0073ff] rounded-full text-white text-xs font-semibold disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 shadow-sm cursor-pointer"
+              >
+                ‹ Prev
+              </button>
+              <div className="flex gap-1.5">
+                {steps.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentStep(i)}
+                    className={`h-2 rounded-full transition-all ${
+                      i === currentStep ? "bg-[#4869ff] w-5" : "bg-gray-200 w-2"
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+                disabled={currentStep === steps.length - 1}
+                aria-label="Next step"
+                className="px-4 py-2 bg-[#0073ff] rounded-full text-white text-xs font-semibold disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 shadow-sm cursor-pointer"
+              >
+                Next ›
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -893,55 +922,54 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
       {/* ══════ SECTION 4 — FAQs ══════ */}
       <section
         id="faqs"
-        className="min-h-screen flex items-center px-16 py-24 bg-[#f8faff]"
+        className="min-h-screen flex items-center px-4 sm:px-8 lg:px-16 py-16 sm:py-24 bg-[#f8faff]"
       >
-        <div className="flex gap-24 w-full max-w-[1300px] mx-auto items-start">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-20 xl:gap-24 w-full max-w-[1300px] mx-auto items-start">
 
           {/* Left sticky overview */}
-          <div className="w-[38%] shrink-0 sticky top-12">
-            <span className="text-[#0073ff] text-[11px] font-semibold uppercase tracking-[4px] block mb-6">
+          <div className="w-full lg:w-[38%] shrink-0 lg:sticky lg:top-12">
+            <span className="text-[#0073ff] text-[11px] font-semibold uppercase tracking-[3px] sm:tracking-[4px] block mb-3 sm:mb-6">
               FAQs
             </span>
             <h2
-              className="text-[#302929] leading-tight tracking-[-2px] mb-6"
+              className="text-[#302929] leading-[1.15] sm:leading-tight tracking-[-1px] sm:tracking-[-2px] mb-4 sm:mb-6 text-[26px] xs:text-[32px] sm:text-[40px] lg:text-[48px] break-words"
               style={{
                 fontFamily: "'DM Serif Display', serif",
-                fontSize: "clamp(34px, 4vw, 56px)",
               }}
             >
               An overview of the FAQs
             </h2>
-            <p className="text-gray-400 text-[16px] leading-relaxed mb-10">
+            <p className="text-gray-500 sm:text-gray-400 text-[14px] sm:text-[16px] leading-relaxed mb-6 sm:mb-10">
               Common questions from DCISM students about finding their ideal OJT company,
               understanding the platform, and making the most of AI-powered interview
               preparation.
             </p>
             <button
               onClick={handleLogin}
-              className="bg-[#0073ff] text-white font-semibold text-[14px] px-9 py-3.5 rounded-full hover:bg-[#0060dd] transition-all shadow-md shadow-blue-100 cursor-pointer"
+              className="w-full sm:w-auto text-center bg-[#0073ff] text-white font-semibold text-[14px] px-8 sm:px-9 py-3 sm:py-3.5 rounded-full hover:bg-[#0060dd] transition-all shadow-md shadow-blue-100 cursor-pointer active:scale-98"
             >
               Get Started →
             </button>
 
-            <div className="mt-12 bg-[#dfe9ff] rounded-[28px] p-7">
+            <div className="mt-8 sm:mt-12 bg-[#dfe9ff] rounded-[22px] sm:rounded-[28px] p-5 sm:p-7 w-full">
               <div
-                className="text-[#0073ff] text-[48px] leading-none mb-1"
+                className="text-[#0073ff] text-[36px] sm:text-[48px] font-bold leading-none mb-1"
                 style={{ fontFamily: "'DM Serif Display', serif" }}
               >
                 300+
               </div>
-              <div className="text-[13px] text-gray-500">
+              <div className="text-[12.5px] sm:text-[13px] text-gray-500">
                 verified DCISM industry partners ready to browse
               </div>
             </div>
           </div>
 
           {/* Right accordion */}
-          <div className="flex-1 flex flex-col gap-3 pt-2">
+          <div className="w-full lg:flex-1 flex flex-col gap-3 pt-2">
             {faqs.map((faq, i) => (
               <div
                 key={i}
-                className={`rounded-[24px] overflow-hidden border transition-all ${
+                className={`rounded-[20px] sm:rounded-[24px] overflow-hidden border transition-all ${
                   openFaq === i
                     ? "border-[#b8d0ff] shadow-sm"
                     : "border-gray-100 hover:border-[#dfe9ff]"
@@ -949,9 +977,9 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full text-left px-7 py-6 flex justify-between items-center gap-6 bg-white"
+                  className="w-full text-left px-5 sm:px-7 py-4 sm:py-6 flex justify-between items-center gap-4 sm:gap-6 bg-white cursor-pointer"
                 >
-                  <span className="font-semibold text-[16px] text-[#302929]">{faq.q}</span>
+                  <span className="font-semibold text-[14.5px] sm:text-[16px] text-[#302929] leading-snug">{faq.q}</span>
                   <span
                     className={`text-[#0073ff] text-2xl shrink-0 leading-none transition-transform duration-200 ${
                       openFaq === i ? "rotate-45" : ""
@@ -961,7 +989,7 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-7 pb-7 bg-white text-[15px] text-gray-500 leading-relaxed border-t border-gray-50 pt-4">
+                  <div className="px-5 sm:px-7 pb-5 sm:pb-7 bg-white text-[13.5px] sm:text-[15px] text-gray-500 leading-relaxed border-t border-gray-50 pt-3 sm:pt-4">
                     {faq.a}
                   </div>
                 )}
@@ -972,7 +1000,7 @@ export default function Landing({ onLogin }: { onLogin?: () => void } = {}) {
       </section>
 
       {/* ══════ FOOTER ══════ */}
-      <footer className="px-16 py-10 bg-[#f8faff] border-t border-gray-100">
+      <footer className="px-4 sm:px-8 lg:px-16 py-8 sm:py-10 bg-[#f8faff] border-t border-gray-100">
         <div className="max-w-[1300px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5">
             <img
