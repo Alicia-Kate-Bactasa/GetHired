@@ -37,7 +37,7 @@ export default function Login({ onLogin, onBack }: Props = {}) {
         router.push("/admin");
       } else {
         try {
-          localStorage.setItem("gethired_auth", JSON.stringify({ role: "student", user: identifier || "2021-00123" }));
+          localStorage.setItem("gethired_auth", JSON.stringify({ role: "student", user: identifier || "21100123" }));
         } catch {}
         handleLoginProp();
       }
@@ -89,7 +89,7 @@ export default function Login({ onLogin, onBack }: Props = {}) {
         <div className="w-full flex items-center justify-center lg:justify-start order-2 lg:order-1">
           <div className="relative w-full max-w-[420px] sm:max-w-[540px] lg:max-w-[620px] flex items-center justify-center lg:justify-start lg:translate-x-7 xl:translate-x-8">
             <img
-              src="/loginPageDesign.png"
+              src="/loginPageDesign.svg"
               alt="GetHired Login Design"
               className="w-full h-auto max-h-[440px] sm:max-h-[600px] lg:max-h-[86vh] object-contain rounded-[32px] select-none pointer-events-none"
             />
@@ -335,7 +335,7 @@ export default function Login({ onLogin, onBack }: Props = {}) {
                 idnumber_firstname
               </div>
               <p className="mt-1.5 text-[11.5px] text-blue-700">
-                Example: Student ID <span className="font-semibold">2021-00123</span> with first name <span className="font-semibold">Ishie</span> has default password <code className="font-semibold">2021-00123_ishie</code>.
+                Example: Student ID <span className="font-semibold">21100123</span> with first name <span className="font-semibold">Ishie</span> has default password <code className="font-semibold">21100123_ishie</code>.
               </p>
             </div>
 

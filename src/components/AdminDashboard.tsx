@@ -102,6 +102,190 @@ const CheckIcon = ({ size = 14 }: { size?: number }) => (
   </svg>
 );
 
+const PowerIcon = ({ size = 14 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+    <line x1="12" y1="2" x2="12" y2="12" />
+  </svg>
+);
+
+interface ConfirmActionState {
+  type: "deactivate" | "reactivate" | "delete";
+  target: "company" | "category" | "question" | "student";
+  id?: string | number;
+  idx?: number;
+  name: string;
+}
+
+const FilterIcon = ({ size = 14 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+  </svg>
+);
+
+const ChevronDownIcon = ({ size = 14, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+function AdminFilterDropdown({
+  value,
+  options,
+  onChange,
+  label = "Filter",
+}: {
+  value: string;
+  options: string[];
+  onChange: (val: string) => void;
+  label?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [open]);
+
+  const isFiltered = value !== "All";
+
+  return (
+    <div className="relative inline-block" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-full border text-[13px] font-medium transition-all shadow-2xs cursor-pointer ${
+          isFiltered
+            ? "bg-[#EEF5FF] border-[#0066FF] text-[#0066FF] font-semibold"
+            : "bg-white border-slate-200 text-slate-700 hover:border-[#0066FF] hover:text-[#0066FF]"
+        }`}
+      >
+        <FilterIcon size={13} />
+        <span className="truncate max-w-[170px]">{value}</span>
+        <ChevronDownIcon
+          size={13}
+          className={`transition-transform duration-200 text-slate-400 ${open ? "rotate-180 text-[#0066FF]" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1.5 z-40 min-w-[240px] max-h-[320px] overflow-y-auto bg-white rounded-2xl shadow-xl border border-slate-100 p-1.5 animate-in fade-in zoom-in-95 duration-100">
+          <div className="px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+            {label}
+          </div>
+          {options.map((opt) => {
+            const isSelected = opt === value;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-[12.5px] font-medium transition-colors cursor-pointer text-left ${
+                  isSelected
+                    ? "bg-[#EEF5FF] text-[#0066FF] font-semibold"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <span className="truncate pr-2">{opt}</span>
+                {isSelected && <CheckIcon size={14} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FormSelect({
+  value,
+  options,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  options: string[] | { label: string; value: string }[];
+  onChange: (val: string) => void;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [open]);
+
+  const selectedLabel =
+    typeof options[0] === "string"
+      ? value
+      : (options as { label: string; value: string }[]).find((o) => o.value === value)?.label || value;
+
+  return (
+    <div className="relative w-full" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`w-full bg-slate-50/70 border rounded-xl px-3.5 py-2.5 text-[13.5px] font-medium text-slate-800 flex items-center justify-between outline-none transition-all cursor-pointer shadow-2xs ${
+          open ? "border-[#0066FF] ring-2 ring-[#0066FF]/10 bg-white" : "border-slate-200 hover:border-slate-300"
+        }`}
+      >
+        <span className="truncate">{selectedLabel || placeholder || "Select option"}</span>
+        <ChevronDownIcon
+          size={14}
+          className={`transition-transform duration-200 text-slate-400 shrink-0 ml-2 ${open ? "rotate-180 text-[#0066FF]" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1.5 w-full z-50 max-h-[220px] overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-100 p-1.5 animate-in fade-in zoom-in-95 duration-100">
+          {options.map((opt) => {
+            const optVal = typeof opt === "string" ? opt : opt.value;
+            const optLabel = typeof opt === "string" ? opt : opt.label;
+            const isSelected = optVal === value;
+            return (
+              <button
+                key={optVal}
+                type="button"
+                onClick={() => {
+                  onChange(optVal);
+                  setOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-medium transition-colors cursor-pointer text-left ${
+                  isSelected
+                    ? "bg-[#EEF5FF] text-[#0066FF] font-semibold"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <span className="truncate pr-2">{optLabel}</span>
+                {isSelected && <CheckIcon size={14} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* Available specialization tags */
 const ALL_SPECIALIZATIONS = [
   "Software Dev",
@@ -307,7 +491,7 @@ export default function AdminDashboard() {
   // States for Companies
   const [companies, setCompanies] = useState<Company[]>(defaultCompanies);
   const [companySearch, setCompanySearch] = useState("");
-  const [selectedIndustry, setSelectedIndustry] = useState<string>("All");
+  const [selectedNiche, setSelectedNiche] = useState<string>("All");
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [cropModalSrc, setCropModalSrc] = useState<string | null>(null);
@@ -368,6 +552,99 @@ export default function AdminDashboard() {
     hint: "",
     feedback: "",
   });
+
+  // Confirmation Modal state for Deactivation / Reactivation
+  const [confirmModal, setConfirmModal] = useState<ConfirmActionState | null>(null);
+
+  const handleRequestDeactivateCompany = (company: Company) => {
+    setConfirmModal({
+      type: "deactivate",
+      target: "company",
+      id: company.id,
+      name: company.name,
+    });
+  };
+
+  const handleRequestReactivateCompany = (company: Company) => {
+    setConfirmModal({
+      type: "reactivate",
+      target: "company",
+      id: company.id,
+      name: company.name,
+    });
+  };
+
+  const handleRequestDeactivateCategory = (cat: InterviewCategory) => {
+    setConfirmModal({
+      type: "deactivate",
+      target: "category",
+      id: cat.id,
+      name: cat.name,
+    });
+  };
+
+  const handleRequestReactivateCategory = (cat: InterviewCategory) => {
+    setConfirmModal({
+      type: "reactivate",
+      target: "category",
+      id: cat.id,
+      name: cat.name,
+    });
+  };
+
+  const handleRequestDeactivateQuestion = (idx: number) => {
+    setConfirmModal({
+      type: "deactivate",
+      target: "question",
+      idx,
+      name: `Question #${idx + 1}`,
+    });
+  };
+
+  const handleRequestReactivateQuestion = (idx: number) => {
+    setConfirmModal({
+      type: "reactivate",
+      target: "question",
+      idx,
+      name: `Question #${idx + 1}`,
+    });
+  };
+
+  const handleRequestDeleteStudent = (s: Student) => {
+    setConfirmModal({
+      type: "delete",
+      target: "student",
+      id: s.id,
+      name: `${s.firstName} ${s.lastName}`,
+    });
+  };
+
+  const handleConfirmAction = () => {
+    if (!confirmModal) return;
+    const { type, target, id, idx } = confirmModal;
+
+    if (target === "company") {
+      setCompanies((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, deactivated: type === "deactivate" } : c))
+      );
+    } else if (target === "category") {
+      setCategories((prev) =>
+        prev.map((cat) => (cat.id === id ? { ...cat, deactivated: type === "deactivate" } : cat))
+      );
+    } else if (target === "question" && selectedCategoryForQuestions && idx !== undefined) {
+      setQuestionsMap((prev) => {
+        const list = [...(prev[selectedCategoryForQuestions.id] || [])];
+        if (list[idx]) {
+          list[idx] = { ...list[idx], deactivated: type === "deactivate" };
+        }
+        return { ...prev, [selectedCategoryForQuestions.id]: list };
+      });
+    } else if (target === "student" && id) {
+      setStudents((prev) => prev.filter((s) => s.id !== id));
+    }
+
+    setConfirmModal(null);
+  };
 
   /* ── Company Actions ── */
   const handleOpenAddCompany = () => {
@@ -459,7 +736,7 @@ export default function AdminDashboard() {
   const handleOpenAddStudent = () => {
     setEditingStudent(null);
     setStudForm({
-      id: `202${Math.floor(Math.random() * 3 + 1)}-00${Math.floor(Math.random() * 800 + 100)}`,
+      id: `24100${Math.floor(Math.random() * 800 + 100)}`,
       firstName: "",
       lastName: "",
       course: "BS Information Technology",
@@ -482,18 +759,13 @@ export default function AdminDashboard() {
     setIsStudentModalOpen(true);
   };
 
-  const handleDeleteStudent = (id: string) => {
-    if (confirm(`Remove student ${id} from the official DCISM database?`)) {
-      setStudents((prev) => prev.filter((s) => s.id !== id));
-    }
-  };
 
   const handleSaveStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!studForm.id || !studForm.firstName || !studForm.lastName) return;
 
     const defaultPwd = generateDefaultPassword(studForm.id, studForm.firstName);
-    const emailComputed = studForm.email || `${studForm.firstName.toLowerCase()}.${studForm.lastName.toLowerCase()}@cit.edu`;
+    const emailComputed = studForm.email || `${studForm.id.trim()}@usc.edu.ph`;
 
     if (editingStudent) {
       setStudents((prev) =>
@@ -637,8 +909,17 @@ export default function AdminDashboard() {
       c.name.toLowerCase().includes(companySearch.toLowerCase()) ||
       c.location.toLowerCase().includes(companySearch.toLowerCase()) ||
       c.specializations.some((s) => s.toLowerCase().includes(companySearch.toLowerCase()));
-    const matchesIndustry = selectedIndustry === "All" || c.industry === selectedIndustry;
-    return matchesSearch && matchesIndustry;
+    const matchesNiche =
+      selectedNiche === "All" ||
+      c.specializations.some(
+        (s) =>
+          s.toLowerCase() === selectedNiche.toLowerCase() ||
+          s.toLowerCase().includes(selectedNiche.toLowerCase()) ||
+          selectedNiche.toLowerCase().includes(s.toLowerCase())
+      ) ||
+      c.industry.toLowerCase().includes(selectedNiche.toLowerCase()) ||
+      selectedNiche.toLowerCase().includes(c.industry.toLowerCase());
+    return matchesSearch && matchesNiche;
   });
 
   const filteredStudents = students.filter((s) => {
@@ -649,14 +930,12 @@ export default function AdminDashboard() {
     const matchesCourse = selectedCourseFilter === "All" || s.course === selectedCourseFilter;
     return matchesSearch && matchesCourse;
   });
-
-  const uniqueIndustries = ["All", ...Array.from(new Set(companies.map((c) => c.industry)))];
   const uniqueCourses = [
     "All",
     "BS Computer Science",
     "BS Information Technology",
     "BS Information Systems",
-    "BS Computer Engineering",
+    "BS Data Science",
   ];
 
   return (
@@ -732,18 +1011,7 @@ export default function AdminDashboard() {
             ))}
           </nav>
 
-          {/* Quick link to student portal */}
-          {!collapsed && (
-            <div className="px-4 mb-3">
-              <button
-                type="button"
-                onClick={() => router.push("/dashboard")}
-                className="w-full text-[12px] font-semibold text-[#0066FF] bg-[#EEF5FF] hover:bg-[#dfe9ff] py-2 rounded-full transition-all cursor-pointer text-center"
-              >
-                Go to Student Portal →
-              </button>
-            </div>
-          )}
+
 
           {/* Centered Logout */}
           <div className="px-2 flex justify-center">
@@ -773,20 +1041,12 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-slate-200 text-[12.5px] font-medium text-slate-600 hover:border-[#0066FF] hover:text-[#0066FF] transition-all cursor-pointer bg-white shadow-2xs"
-            >
-              <span>Preview Student View</span>
-              <span>↗</span>
-            </button>
             <div className="flex items-center gap-2.5 bg-white border border-slate-200/90 rounded-full pl-1.5 pr-4 py-1.5 shadow-2xs">
               <div className="w-8 h-8 rounded-full bg-[#0066FF] text-white font-bold text-[13px] flex items-center justify-center">
                 A
               </div>
               <div className="text-left leading-tight hidden sm:block">
                 <div className="text-[12.5px] font-semibold text-[#0F172A]">Administrator</div>
-                <div className="text-[10.5px] text-slate-400">admin@cit.edu</div>
               </div>
             </div>
           </div>
@@ -815,16 +1075,13 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  {/* Industry filter */}
-                  <select
-                    value={selectedIndustry}
-                    onChange={(e) => setSelectedIndustry(e.target.value)}
-                    className="bg-white border border-slate-200 rounded-full px-4 py-2 text-[13.5px] text-slate-700 outline-none focus:border-[#0066FF] cursor-pointer"
-                  >
-                    {uniqueIndustries.map((ind) => (
-                      <option key={ind} value={ind}>{ind}</option>
-                    ))}
-                  </select>
+                  {/* Niche / Specialization filter dropdown */}
+                  <AdminFilterDropdown
+                    value={selectedNiche}
+                    options={["All", ...ALL_SPECIALIZATIONS]}
+                    onChange={setSelectedNiche}
+                    label="Specialization / Niche"
+                  />
                 </div>
 
                 <button
@@ -842,9 +1099,6 @@ export default function AdminDashboard() {
                 <div>
                   Showing <span className="font-bold text-[#0F172A]">{filteredCompanies.length}</span> accredited industry partners
                 </div>
-                <div className="text-slate-400">
-                  Total OJT Slots: <span className="font-bold text-emerald-600">{companies.reduce((sum, c) => sum + c.slots, 0)}</span>
-                </div>
               </div>
 
               {/* Companies Grid using shared CompanyCard component */}
@@ -855,7 +1109,8 @@ export default function AdminDashboard() {
                     company={c}
                     isAdmin={true}
                     onEdit={handleOpenEditCompany}
-                    onDelete={handleDeleteCompany}
+                    onDeactivate={handleRequestDeactivateCompany}
+                    onReactivate={handleRequestReactivateCompany}
                   />
                 ))}
               </div>
@@ -883,7 +1138,7 @@ export default function AdminDashboard() {
                   <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono font-semibold text-[#0066FF]">
                     idnumber_firstname
                   </code>{" "}
-                  (e.g., <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono text-[#0066FF]">2021-00123_ishie</code>). Students can independently update their password at any time via the Forgot Password prompt on the login screen.
+                  (e.g., <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono text-[#0066FF]">21100123_ishie</code>). Students can independently update their password at any time via the Forgot Password prompt on the login screen.
                 </div>
               </div>
 
@@ -904,16 +1159,13 @@ export default function AdminDashboard() {
                     />
                   </div>
 
-                  {/* Course dropdown */}
-                  <select
+                  {/* Course filter dropdown */}
+                  <AdminFilterDropdown
                     value={selectedCourseFilter}
-                    onChange={(e) => setSelectedCourseFilter(e.target.value)}
-                    className="bg-white border border-slate-200 rounded-full px-4 py-2 text-[13.5px] text-slate-700 outline-none focus:border-[#0066FF] cursor-pointer"
-                  >
-                    {uniqueCourses.map((crs) => (
-                      <option key={crs} value={crs}>{crs}</option>
-                    ))}
-                  </select>
+                    options={uniqueCourses}
+                    onChange={setSelectedCourseFilter}
+                    label="Degree Program / Course"
+                  />
                 </div>
 
                 <button
@@ -989,7 +1241,7 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleDeleteStudent(s.id)}
+                                onClick={() => handleRequestDeleteStudent(s)}
                                 className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
                                 title="Delete Student"
                               >
@@ -1072,7 +1324,9 @@ export default function AdminDashboard() {
                     {(questionsMap[selectedCategoryForQuestions.id] || []).map((q, idx) => (
                       <div
                         key={idx}
-                        className="bg-white rounded-[24px] p-6 border border-slate-200/80 shadow-2xs hover:border-[#0066FF]/40 transition-all"
+                        className={`bg-white rounded-[24px] p-6 border border-slate-200/80 shadow-2xs hover:border-[#0066FF]/40 transition-all ${
+                          q.deactivated ? "opacity-75 bg-slate-50/50" : ""
+                        }`}
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
@@ -1083,6 +1337,11 @@ export default function AdminDashboard() {
                               <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
                                 {q.type}
                               </span>
+                              {q.deactivated && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 uppercase tracking-wider">
+                                  Deactivated
+                                </span>
+                              )}
                             </div>
                             <h4 className="text-[15px] font-semibold text-[#0F172A] leading-snug">
                               {q.question}
@@ -1100,22 +1359,35 @@ export default function AdminDashboard() {
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEditQuestion(idx, q)}
-                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0066FF] flex items-center justify-center transition-colors cursor-pointer"
-                              title="Edit Question"
-                            >
-                              <EditIcon size={14} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteQuestion(idx)}
-                              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
-                              title="Delete Question"
-                            >
-                              <TrashIcon size={14} />
-                            </button>
+                            {q.deactivated ? (
+                              <button
+                                type="button"
+                                onClick={() => handleRequestReactivateQuestion(idx)}
+                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-[11px] font-bold transition-colors cursor-pointer shadow-sm"
+                                title="Reactivate Question"
+                              >
+                                Reactivate
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditQuestion(idx, q)}
+                                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0066FF] flex items-center justify-center transition-colors cursor-pointer"
+                                  title="Edit Question"
+                                >
+                                  <EditIcon size={14} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRequestDeactivateQuestion(idx)}
+                                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-600 flex items-center justify-center transition-colors cursor-pointer"
+                                  title="Deactivate Question"
+                                >
+                                  <PowerIcon size={14} />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1157,7 +1429,8 @@ export default function AdminDashboard() {
                         questionCount={(questionsMap[cat.id] || []).length}
                         isAdmin={true}
                         onEdit={handleOpenEditCategory}
-                        onDelete={handleDeleteCategory}
+                        onDeactivate={handleRequestDeactivateCategory}
+                        onReactivate={handleRequestReactivateCategory}
                         onManageQuestions={setSelectedCategoryForQuestions}
                       />
                     ))}
@@ -1252,26 +1525,14 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Location</label>
-                  <input
-                    type="text"
-                    value={compForm.location}
-                    onChange={(e) => setCompForm({ ...compForm, location: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Available Slots</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={compForm.slots}
-                    onChange={(e) => setCompForm({ ...compForm, slots: parseInt(e.target.value) || 0 })}
-                    className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
-                  />
-                </div>
+              <div>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Location</label>
+                <input
+                  type="text"
+                  value={compForm.location}
+                  onChange={(e) => setCompForm({ ...compForm, location: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2 text-[13.5px] outline-none focus:border-[#0066FF]"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
@@ -1379,11 +1640,11 @@ export default function AdminDashboard() {
 
             <form onSubmit={handleSaveStudent} className="space-y-4">
               <div>
-                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Student ID (2XXXXXXX)</label>
+                <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Student ID (8 Digits, e.g. 21100123)</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 2021-00123"
+                  placeholder="e.g. 21100123"
                   value={studForm.id}
                   onChange={(e) => setStudForm({ ...studForm, id: e.target.value })}
                   className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] font-mono outline-none focus:border-[#0066FF]"
@@ -1417,28 +1678,25 @@ export default function AdminDashboard() {
 
               <div>
                 <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Degree Program</label>
-                <select
-                  value={studForm.course}
-                  onChange={(e) => setStudForm({ ...studForm, course: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF] bg-white cursor-pointer"
-                >
-                  <option value="BS Computer Science">BS Computer Science</option>
-                  <option value="BS Information Technology">BS Information Technology</option>
-                  <option value="BS Information Systems">BS Information Systems</option>
-                  <option value="BS Computer Engineering">BS Computer Engineering</option>
-                </select>
+                <FormSelect
+                  value={studForm.course || "BS Information Technology"}
+                  options={[
+                    "BS Computer Science",
+                    "BS Information Technology",
+                    "BS Information Systems",
+                    "BS Data Science",
+                  ]}
+                  onChange={(val) => setStudForm({ ...studForm, course: val })}
+                />
               </div>
 
               <div>
                 <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Year Level</label>
-                <select
-                  value={studForm.yearLevel}
-                  onChange={(e) => setStudForm({ ...studForm, yearLevel: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF] bg-white cursor-pointer"
-                >
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                </select>
+                <FormSelect
+                  value={studForm.yearLevel || "4th Year"}
+                  options={["1st Year", "2nd Year", "3rd Year", "4th Year"]}
+                  onChange={(val) => setStudForm({ ...studForm, yearLevel: val })}
+                />
               </div>
 
               {/* Password Formula Box */}
@@ -1594,16 +1852,11 @@ export default function AdminDashboard() {
             <form onSubmit={handleSaveQuestion} className="space-y-4">
               <div>
                 <label className="block text-[12.5px] font-semibold text-slate-700 mb-1">Question Type</label>
-                <select
-                  value={questionForm.type}
-                  onChange={(e) => setQuestionForm({ ...questionForm, type: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none focus:border-[#0066FF] bg-white cursor-pointer"
-                >
-                  <option value="Technical">Technical</option>
-                  <option value="Behavioral">Behavioral</option>
-                  <option value="Situational">Situational</option>
-                  <option value="Coding">Coding</option>
-                </select>
+                <FormSelect
+                  value={questionForm.type || "Technical"}
+                  options={["Technical", "Behavioral", "Situational", "Coding"]}
+                  onChange={(val) => setQuestionForm({ ...questionForm, type: val })}
+                />
               </div>
 
               <div>
@@ -1656,6 +1909,85 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirmation Modal (Deactivate / Reactivate / Delete) ── */}
+      {confirmModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/45 backdrop-blur-xs"
+          onClick={() => setConfirmModal(null)}
+        >
+          <div
+            className="bg-white rounded-[32px] w-full max-w-md shadow-2xl p-7 text-left border border-slate-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                  confirmModal.type === "delete"
+                    ? "bg-red-50 text-red-600 border border-red-200/60"
+                    : confirmModal.type === "deactivate"
+                    ? "bg-amber-50 text-amber-600 border border-amber-200/60"
+                    : "bg-emerald-50 text-emerald-600 border border-emerald-200/60"
+                }`}
+              >
+                {confirmModal.type === "delete" ? (
+                  <TrashIcon size={20} />
+                ) : confirmModal.type === "deactivate" ? (
+                  <PowerIcon size={22} />
+                ) : (
+                  <CheckIcon size={22} />
+                )}
+              </div>
+              <div className="flex-1">
+                <h3
+                  className="text-[19px] font-bold text-slate-900 leading-snug"
+                  style={{ fontFamily: "'DM Serif Display', serif" }}
+                >
+                  {confirmModal.type === "delete"
+                    ? "Remove Student from Registry"
+                    : confirmModal.type === "deactivate"
+                    ? `Deactivate ${confirmModal.target === "company" ? "Company" : confirmModal.target === "category" ? "Interview Category" : "Question"}`
+                    : `Reactivate ${confirmModal.target === "company" ? "Company" : confirmModal.target === "category" ? "Interview Category" : "Question"}`}
+                </h3>
+                <p className="text-[13px] text-slate-500 mt-2 leading-relaxed">
+                  {confirmModal.type === "delete"
+                    ? `Remove student ${confirmModal.id} from the official DCISM database?`
+                    : confirmModal.type === "deactivate"
+                    ? `Are you sure you want to deactivate "${confirmModal.name}"? It will be marked as inactive and can be reactivated at any time.`
+                    : `Are you sure you want to reactivate "${confirmModal.name}"? It will immediately become active and available again.`}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-7 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setConfirmModal(null)}
+                className="px-5 py-2.5 border border-slate-200 text-slate-600 text-[13px] font-semibold rounded-full hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAction}
+                className={`px-5 py-2.5 text-[13px] font-semibold rounded-full text-white shadow-sm transition-all cursor-pointer active:scale-98 ${
+                  confirmModal.type === "delete"
+                    ? "bg-red-600 hover:bg-red-700 shadow-red-600/20"
+                    : confirmModal.type === "deactivate"
+                    ? "bg-amber-600 hover:bg-amber-700 shadow-amber-600/20"
+                    : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
+                }`}
+              >
+                {confirmModal.type === "delete"
+                  ? "Yes, Remove"
+                  : confirmModal.type === "deactivate"
+                  ? "Yes, Deactivate"
+                  : "Yes, Reactivate"}
+              </button>
+            </div>
           </div>
         </div>
       )}

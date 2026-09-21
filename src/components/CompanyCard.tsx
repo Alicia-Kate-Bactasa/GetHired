@@ -10,7 +10,25 @@ export interface CompanyCardProps {
   onViewMore?: (c: Company) => void;
   onEdit?: (c: Company) => void;
   onDelete?: (id: number) => void;
+  onDeactivate?: (c: Company) => void;
+  onReactivate?: (c: Company) => void;
 }
+
+const PowerIcon = ({ size = 13 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+    <line x1="12" y1="2" x2="12" y2="12" />
+  </svg>
+);
 
 const BookmarkIcon = ({ filled = false }: { filled?: boolean }) => (
   <svg
@@ -82,9 +100,15 @@ export default function CompanyCard({
   onViewMore,
   onEdit,
   onDelete,
+  onDeactivate,
+  onReactivate,
 }: CompanyCardProps) {
   return (
-    <div className="bg-white rounded-[32px] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-slate-100 hover:border-slate-200/80 h-full group">
+    <div
+      className={`bg-white rounded-[32px] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-slate-100 hover:border-slate-200/80 h-full group ${
+        company.deactivated ? "opacity-75 bg-slate-50/50" : ""
+      }`}
+    >
       {/* Card Image Banner */}
       <div className="relative h-[140px] bg-slate-100 overflow-hidden shrink-0">
         <img
@@ -93,30 +117,56 @@ export default function CompanyCard({
           className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
         />
 
+        {company.deactivated && (
+          <span className="absolute top-3 left-3 bg-amber-500 text-white text-[10.5px] font-bold px-2.5 py-0.5 rounded-full shadow-xs uppercase tracking-wider backdrop-blur-xs">
+            Deactivated
+          </span>
+        )}
+
         {isAdmin ? (
           <div className="absolute top-3 right-3 flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit?.(company);
-              }}
-              className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-[#0066FF] shadow-sm flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
-              title="Edit Company"
-            >
-              <EditIcon size={13} />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete?.(company.id);
-              }}
-              className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-red-600 shadow-sm flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
-              title="Delete Company"
-            >
-              <TrashIcon size={13} />
-            </button>
+            {company.deactivated ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReactivate?.(company);
+                }}
+                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-full shadow-sm flex items-center gap-1 cursor-pointer transition-colors"
+                title="Reactivate Company"
+              >
+                Reactivate
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(company);
+                  }}
+                  className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-[#0066FF] shadow-sm flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
+                  title="Edit Company"
+                >
+                  <EditIcon size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onDeactivate) {
+                      onDeactivate(company);
+                    } else {
+                      onDelete?.(company.id);
+                    }
+                  }}
+                  className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-amber-600 shadow-sm flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
+                  title="Deactivate Company"
+                >
+                  <PowerIcon size={13} />
+                </button>
+              </>
+            )}
           </div>
         ) : onToggleSave ? (
           <button
@@ -176,25 +226,32 @@ export default function CompanyCard({
         </div>
 
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-[11px] text-gray-400 flex items-center gap-1 truncate max-w-[170px]">
+          <span className="text-[11px] text-gray-400 flex items-center gap-1 truncate">
             <LocationIcon />
             <span className="truncate">{company.location.split(",")[1]?.trim() ?? company.location}</span>
-          </span>
-          <span className="text-[11px] text-[#059669] font-medium shrink-0">
-            {company.slots} slots
           </span>
         </div>
 
         <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
           {isAdmin ? (
             <>
-              <button
-                type="button"
-                onClick={() => onEdit?.(company)}
-                className="text-[11.5px] font-semibold text-[#0066FF] hover:underline cursor-pointer"
-              >
-                Edit Company →
-              </button>
+              {company.deactivated ? (
+                <button
+                  type="button"
+                  onClick={() => onReactivate?.(company)}
+                  className="text-[11.5px] font-bold text-emerald-600 hover:underline cursor-pointer"
+                >
+                  Reactivate Company
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onEdit?.(company)}
+                  className="text-[11.5px] font-semibold text-[#0066FF] hover:underline cursor-pointer"
+                >
+                  Edit Company →
+                </button>
+              )}
               {onViewMore && (
                 <button
                   type="button"

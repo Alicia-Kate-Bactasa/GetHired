@@ -11,8 +11,26 @@ export interface CategoryCardProps {
   onSelect?: () => void;
   onEdit?: (cat: InterviewCategory) => void;
   onDelete?: (id: string) => void;
+  onDeactivate?: (cat: InterviewCategory) => void;
+  onReactivate?: (cat: InterviewCategory) => void;
   onManageQuestions?: (cat: InterviewCategory) => void;
 }
+
+const PowerIcon = ({ size = 14 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+    <line x1="12" y1="2" x2="12" y2="12" />
+  </svg>
+);
 
 /* Category SVG icons */
 const WebDevIcon      = ({ size = 24 }: { size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4M7 9l3 3-3 3M13 15h4" /></svg>;
@@ -97,6 +115,8 @@ export default function CategoryCard({
   onSelect,
   onEdit,
   onDelete,
+  onDeactivate,
+  onReactivate,
   onManageQuestions,
 }: CategoryCardProps) {
   return (
@@ -104,42 +124,69 @@ export default function CategoryCard({
       onClick={!isAdmin ? onSelect : undefined}
       className={`bg-white rounded-[32px] p-6 text-left border border-slate-200/80 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group ${
         !isAdmin ? "cursor-pointer hover:border-[#b8d0ff]" : ""
-      }`}
+      } ${category.deactivated ? "opacity-75 bg-slate-50/50" : ""}`}
     >
       <div>
         {/* Header: Category Icon + optional Admin Actions */}
         <div className="flex items-start justify-between gap-3 mb-4">
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0"
-            style={{ background: category.bg, color: category.color }}
-          >
-            <CategoryIcon id={category.id} size={24} />
+          <div className="flex items-center gap-3">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0"
+              style={{ background: category.bg, color: category.color }}
+            >
+              <CategoryIcon id={category.id} size={24} />
+            </div>
+            {category.deactivated && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 uppercase tracking-wider">
+                Deactivated
+              </span>
+            )}
           </div>
 
           {isAdmin && (
             <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit?.(category);
-                }}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0066FF] flex items-center justify-center transition-colors cursor-pointer"
-                title="Edit Category Info"
-              >
-                <EditIcon size={14} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete?.(category.id);
-                }}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
-                title="Delete Category"
-              >
-                <TrashIcon size={14} />
-              </button>
+              {category.deactivated ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReactivate?.(category);
+                  }}
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-[11px] font-bold transition-colors cursor-pointer shadow-sm"
+                  title="Reactivate Interview Category"
+                >
+                  Reactivate
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit?.(category);
+                    }}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-[#0066FF] flex items-center justify-center transition-colors cursor-pointer"
+                    title="Edit Category Info"
+                  >
+                    <EditIcon size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onDeactivate) {
+                        onDeactivate(category);
+                      } else {
+                        onDelete?.(category.id);
+                      }
+                    }}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-600 flex items-center justify-center transition-colors cursor-pointer"
+                    title="Deactivate Category"
+                  >
+                    <PowerIcon size={14} />
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>

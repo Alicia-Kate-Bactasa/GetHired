@@ -13,10 +13,11 @@ export interface Company {
   email: string;
   phone: string;
   hours: string;
+  deactivated?: boolean;
 }
 
 export interface Student {
-  id: string; // e.g. "2021-00123"
+  id: string; // e.g. "21100123" (USC 8-digit format)
   firstName: string;
   lastName: string;
   course: string;
@@ -33,94 +34,103 @@ export function generateDefaultPassword(id: string, firstName: string): string {
 
 export const initialStudents: Student[] = [
   {
-    id: "2021-00123",
+    id: "21100123",
     firstName: "Ishie",
     lastName: "Boo",
     course: "BS Information Technology",
     yearLevel: "4th Year",
-    email: "ishie.boo@cit.edu",
-    defaultPassword: "2021-00123_ishie",
+    email: "21100123@usc.edu.ph",
+    defaultPassword: "21100123_ishie",
   },
   {
-    id: "2021-00452",
+    id: "21100452",
     firstName: "Marcus",
     lastName: "Tan",
     course: "BS Computer Science",
     yearLevel: "4th Year",
-    email: "marcus.tan@cit.edu",
-    defaultPassword: "2021-00452_marcus",
+    email: "21100452@usc.edu.ph",
+    defaultPassword: "21100452_marcus",
   },
   {
-    id: "2022-01290",
+    id: "22101290",
     firstName: "Samantha",
     lastName: "Reyes",
     course: "BS Information Systems",
     yearLevel: "3rd Year",
-    email: "samantha.reyes@cit.edu",
-    defaultPassword: "2022-01290_samantha",
+    email: "22101290@usc.edu.ph",
+    defaultPassword: "22101290_samantha",
   },
   {
-    id: "2021-00871",
+    id: "21100871",
     firstName: "Kenji",
     lastName: "Sato",
-    course: "BS Computer Engineering",
+    course: "BS Computer Science",
     yearLevel: "4th Year",
-    email: "kenji.sato@cit.edu",
-    defaultPassword: "2021-00871_kenji",
+    email: "21100871@usc.edu.ph",
+    defaultPassword: "21100871_kenji",
   },
   {
-    id: "2022-00341",
+    id: "22100341",
     firstName: "Althea",
     lastName: "Cruz",
     course: "BS Computer Science",
     yearLevel: "3rd Year",
-    email: "althea.cruz@cit.edu",
-    defaultPassword: "2022-00341_althea",
+    email: "22100341@usc.edu.ph",
+    defaultPassword: "22100341_althea",
   },
   {
-    id: "2021-01124",
+    id: "21101124",
     firstName: "Christian",
     lastName: "Gomez",
     course: "BS Information Technology",
     yearLevel: "4th Year",
-    email: "christian.gomez@cit.edu",
-    defaultPassword: "2021-01124_christian",
+    email: "21101124@usc.edu.ph",
+    defaultPassword: "21101124_christian",
   },
   {
-    id: "2022-00982",
+    id: "22100982",
     firstName: "Chloe",
     lastName: "Villanueva",
     course: "BS Information Systems",
     yearLevel: "3rd Year",
-    email: "chloe.villanueva@cit.edu",
-    defaultPassword: "2022-00982_chloe",
+    email: "22100982@usc.edu.ph",
+    defaultPassword: "22100982_chloe",
   },
   {
-    id: "2021-01560",
+    id: "21101560",
     firstName: "Paolo",
     lastName: "Navarro",
-    course: "BS Computer Engineering",
+    course: "BS Data Science",
     yearLevel: "4th Year",
-    email: "paolo.navarro@cit.edu",
-    defaultPassword: "2021-01560_paolo",
+    email: "21101560@usc.edu.ph",
+    defaultPassword: "21101560_paolo",
   },
   {
-    id: "2023-00189",
+    id: "23100189",
     firstName: "Bea",
     lastName: "Lim",
-    course: "BS Computer Science",
+    course: "BS Data Science",
     yearLevel: "3rd Year",
-    email: "bea.lim@cit.edu",
-    defaultPassword: "2023-00189_bea",
+    email: "23100189@usc.edu.ph",
+    defaultPassword: "23100189_bea",
   },
   {
-    id: "2022-00715",
+    id: "22100715",
     firstName: "Justin",
     lastName: "Salazar",
     course: "BS Information Technology",
     yearLevel: "3rd Year",
-    email: "justin.salazar@cit.edu",
-    defaultPassword: "2022-00715_justin",
+    email: "22100715@usc.edu.ph",
+    defaultPassword: "22100715_justin",
+  },
+  {
+    id: "21100994",
+    firstName: "Gabriel",
+    lastName: "Mendoza",
+    course: "BS Data Science",
+    yearLevel: "4th Year",
+    email: "21100994@usc.edu.ph",
+    defaultPassword: "21100994_gabriel",
   },
 ];
 
@@ -277,6 +287,7 @@ export interface InterviewCategory {
   description: string;
   color: string;
   bg: string;
+  deactivated?: boolean;
 }
 
 export const interviewCategories: InterviewCategory[] = [
@@ -384,6 +395,7 @@ export interface InterviewQuestion {
   type: string;
   hint: string;
   feedback: string;
+  deactivated?: boolean;
 }
 
 export const interviewQuestions: Record<string, InterviewQuestion[]> = {

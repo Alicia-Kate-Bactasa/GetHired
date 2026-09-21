@@ -159,9 +159,6 @@ function CompanyModal({
               <span className="text-[11px] bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
                 {company.type}
               </span>
-              <span className="ml-auto text-[12px] text-[#059669] font-semibold bg-green-50 px-3 py-1 rounded-full">
-                {company.slots} slots open
-              </span>
             </div>
 
             {/* Name */}
@@ -1196,7 +1193,7 @@ function InterviewView() {
 /* ═══════════════════════════════ DASHBOARD SHELL ════════════════════ */
 export default function Dashboard({ onLogout }: Props = {}) {
   const router = useRouter();
-  const handleLogout = onLogout ?? (() => router.push("/login"));
+  const handleLogout = onLogout ?? (() => router.push("/"));
   const [view, setView] = useState<DashView>("home");
   const [companies, setCompanies] = useState(initialCompanies);
   const [collapsed, setCollapsed] = useState(false);
@@ -1204,7 +1201,7 @@ export default function Dashboard({ onLogout }: Props = {}) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({
     name: "Ishie Boo",
-    studentId: "2021-00123",
+    studentId: "21100123",
     course: "BS Information Technology",
   });
 
