@@ -19,9 +19,19 @@ npm run dev
 - `src/app/globals.css` - Global CSS entrypoint with Tailwind CSS v4 theme customization
 - `src/app/page.tsx` - Landing page route (`/`)
 - `src/app/login/page.tsx` - Login page route (`/login`)
-- `src/app/dashboard/page.tsx` - Dashboard page route (`/dashboard`)
-- `src/components/` - View components (`Landing.tsx`, `Login.tsx`, `Dashboard.tsx`)
-- `src/data.ts` - Mock data and TypeScript interfaces for companies, categories, questions, and coding challenges
+- `src/app/dashboard/page.tsx` - Student dashboard page route (`/dashboard`)
+- `src/app/admin/page.tsx` - Administrator dashboard route (`/admin`)
+- `src/components/` - View components:
+  - `Landing.tsx` - Public landing page view
+  - `Login.tsx` - Authentication view with 3-step OTP password reset
+  - `Dashboard.tsx` - Student workspace, company exploration, bookmarking, and mock interview practice
+  - `AdminDashboard.tsx` - DCISM admin console for company management, student registry, and question bank
+  - `CompanyCard.tsx` - Reusable company display card with activate/deactivate states
+  - `CategoryCard.tsx` - Reusable interview category card
+- `src/data.ts` - Centralized mock data and TypeScript interfaces (`Student`, `Company`, `InterviewCategory`, `InterviewQuestion`, `CodingChallenge`)
+- `public/` - Static assets:
+  - `getHiredLogo.png` - App brand logo
+  - `loginPageDesign.png` - Login screen illustration
 - `next.config.ts` - Next.js configuration with remote Unsplash images support
 - `postcss.config.mjs` - PostCSS configuration with `@tailwindcss/postcss`
 - `tsconfig.json` - TypeScript configuration with `@/*` path aliases
