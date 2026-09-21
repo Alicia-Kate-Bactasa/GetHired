@@ -1053,7 +1053,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto px-8 py-7">
+        <main className={`flex-1 px-8 py-6 ${activeTab === "students" ? "overflow-hidden flex flex-col" : "overflow-y-auto"}`}>
 
           {/* ════════════════════ TAB 1: COMPANIES ════════════════════ */}
           {activeTab === "companies" && (
@@ -1125,25 +1125,25 @@ export default function AdminDashboard() {
 
           {/* ════════════════════ TAB 2: STUDENTS ════════════════════ */}
           {activeTab === "students" && (
-            <div>
+            <div className="flex flex-col flex-1 min-h-0">
               {/* Notice Banner about Password Formula */}
-              <div className="mb-6 p-5 bg-blue-50/80 border border-blue-100 rounded-[32px] flex items-start gap-3.5">
-                <div className="w-8 h-8 rounded-full bg-[#0066FF] text-white flex items-center justify-center shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <div className="mb-4 p-4 bg-blue-50/80 border border-blue-100 rounded-[26px] flex items-start gap-3 shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[#0066FF] text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
                 </div>
-                <div className="text-[13px] text-blue-900 leading-relaxed">
+                <div className="text-[12.5px] text-blue-900 leading-relaxed">
                   <span className="font-bold">Student Credential Policy:</span> All DCISM student accounts have their default password pre-filled as{" "}
-                  <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono font-semibold text-[#0066FF]">
+                  <code className="bg-blue-100/80 px-2 py-0.5 rounded-full text-[11.5px] font-mono font-semibold text-[#0066FF]">
                     idnumber_firstname
                   </code>{" "}
-                  (e.g., <code className="bg-blue-100/80 px-2.5 py-0.5 rounded-full text-[12px] font-mono text-[#0066FF]">21100123_ishie</code>). Students can independently update their password at any time via the Forgot Password prompt on the login screen.
+                  (e.g., <code className="bg-blue-100/80 px-2 py-0.5 rounded-full text-[11.5px] font-mono text-[#0066FF]">21100123_ishie</code>). Students can independently update their password at any time via the Forgot Password prompt on the login screen.
                 </div>
               </div>
 
               {/* Filters and Add Student Button */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 shrink-0">
                 <div className="flex flex-wrap items-center gap-3 flex-1 max-w-2xl">
                   {/* Search student */}
                   <div className="relative flex-1 min-w-[240px]">
@@ -1171,7 +1171,7 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={handleOpenAddStudent}
-                  className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98"
+                  className="inline-flex items-center gap-2 bg-[#0066FF] hover:bg-[#0052cc] text-white text-[13.5px] font-semibold px-5 py-2 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-98 shrink-0"
                 >
                   <PlusIcon size={16} />
                   <span>Add Student</span>
@@ -1179,8 +1179,8 @@ export default function AdminDashboard() {
               </div>
 
               {/* Minimalist Student Table List */}
-              <div className="bg-white rounded-[32px] border border-slate-200/80 shadow-2xs overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="bg-white rounded-[32px] border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col flex-1 min-h-0">
+                <div className="px-6 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
                   <div className="text-[13px] font-bold uppercase tracking-wider text-slate-500">
                     Enrolled Students ({filteredStudents.length})
                   </div>
@@ -1189,15 +1189,15 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-[13.5px]">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-slate-400 text-[11.5px] uppercase font-bold tracking-wider bg-slate-50/40">
-                        <th className="py-3 px-6">Student ID</th>
-                        <th className="py-3 px-6">Full Name</th>
-                        <th className="py-3 px-6">Course & Year</th>
-                        <th className="py-3 px-6">Generated Default Password</th>
-                        <th className="py-3 px-6 text-right">Actions</th>
+                <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
+                  <table className="w-full min-w-[720px] text-left border-collapse text-[13.5px]">
+                    <thead className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200/80 shadow-2xs">
+                      <tr className="text-slate-400 text-[11.5px] uppercase font-bold tracking-wider">
+                        <th className="py-3.5 px-6">Student ID</th>
+                        <th className="py-3.5 px-6">Full Name</th>
+                        <th className="py-3.5 px-6">Course & Year</th>
+                        <th className="py-3.5 px-6">Generated Default Password</th>
+                        <th className="py-3.5 px-6 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
