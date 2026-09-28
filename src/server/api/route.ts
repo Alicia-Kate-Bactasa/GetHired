@@ -1,0 +1,160 @@
+import "server-only"
+import { randomUUID } from "node:crypto"
+import { getServerConfig, type ServerConfig } from "../config"
+import { logRequest, type RequestLogger } from "../logging/request"
+import { parseBody, readLimitedBody, type BodyFormat } from "./body"
+import { ApiError, type ApiErrorCode } from "./errors"
+import { errorResponse, successResponse, type ApiResult } from "./responses"
+
+export const HTTP_METHODS = [
+  "GET",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+  "OPTIONS",
+] as const
+type HttpMethod = typeof HTTP_METHODS[number]
+export type AccessPolicy = { kind: "public" } | {
+  kind: "protected"
+  permission?: string
+}
+type Params = Record<string, string | string[] | undefined>
+type RouteContext = { params: Promise<Params> }
+
+export interface ApiContext {
+  request: Request
+  requestId: string
+  params: Params
+  body: unknown
+  actor: { id: string } | null
+}
+
+interface Endpoint {
+  body: BodyFormat
+  handle: (context: ApiContext) => ApiResult | Promise<ApiResult>
+}
+
+interface RouteDefinition {
+  /** Static template, e.g. /api/companies/[companyId]; never a request URL. */
+  route: string
+  access: AccessPolicy
+  methods: Partial<Record<HttpMethod, Endpoint>>
+}
+
+interface Dependencies {
+  config?: () => ServerConfig
+  logger?: RequestLogger
+  /** Later phases must verify identity, session, account state, and endpoint permission here. */
+  enforceAccess?: (
+    request: Request,
+    policy: Extract<AccessPolicy, { kind: "protected" }>,
+  ) => Promise<{ id: string }>
+}
+
+export function createApiRoute(
+  definition: RouteDefinition,
+  dependencies: Dependencies = {},
+) {
+  if (
+    !definition.access ||
+    !["public", "protected"].includes(definition.access.kind)
+  ) {
+    throw new Error("Every API route must declare its access policy.")
+  }
+  if (
+    !definition.route.startsWith("/api") ||
+    /[?\r\n#]/.test(definition.route)
+  ) {
+    throw new Error("API logging requires a static route template.")
+  }
+  const allow = HTTP_METHODS.filter((method) => definition.methods[method])
+
+  const dispatch = async (
+    request: Request,
+    routeContext?: RouteContext,
+  ): Promise<Response> => {
+    const requestId = randomUUID() // Never trust a caller-supplied correlation ID.
+    const started = performance.now()
+    let response: Response
+    let actor: ApiContext["actor"] = null
+    let errorCode: ApiErrorCode | undefined
+    try {
+      const config = (dependencies.config ?? getServerConfig)()
+      const endpoint = HTTP_METHODS.includes(request.method as HttpMethod)
+        ? definition.methods[(request.method as HttpMethod)]
+        : undefined
+      if (!endpoint) {
+        throw allow.length
+          ? new ApiError("METHOD_NOT_ALLOWED", { allow })
+          : new ApiError("NOT_FOUND")
+      }
+      const bytes = await readLimitedBody(request, config.maxBodyBytes)
+      if (definition.access.kind === "protected") {
+        // Fail closed until the authentication/authorization phases supply the implementation.
+        if (!dependencies.enforceAccess)
+          throw new ApiError("SERVICE_UNAVAILABLE")
+        actor = await dependencies.enforceAccess(request, definition.access)
+        if (
+          !actor ||
+          !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            actor.id,
+          )
+        ) {
+          actor = null
+          throw new ApiError("SERVICE_UNAVAILABLE")
+        }
+      }
+      const body = parseBody(request, bytes, endpoint.body)
+      response = successResponse(
+        await endpoint.handle({
+          request,
+          requestId,
+          actor,
+          body,
+          params: routeContext ? await routeContext.params : {},
+        }),
+        requestId,
+      )
+    } catch (error) {
+      const safeError =
+        error instanceof ApiError ? error : new ApiError("INTERNAL_ERROR")
+      errorCode = safeError.code
+      response = errorResponse(safeError, requestId)
+    }
+    try {
+      await (dependencies.logger ?? logRequest)({
+        requestId,
+        route: definition.route,
+        method: HTTP_METHODS.includes(request.method as HttpMethod)
+          ? request.method
+          : "OTHER",
+        status: response.status,
+        durationMs: Math.round((performance.now() - started) * 100) / 100,
+        ...(actor ? { actorId: actor.id } : {}),
+        ...(errorCode ? { errorCode } : {}),
+      })
+    } catch {
+      // Request-log availability must not change the response or bypass a denied request.
+    }
+    // HTTP forbids HEAD bodies; status and headers still follow the API contract.
+    return request.method === "HEAD"
+      ? new Response(null, {
+          status: response.status,
+          headers: response.headers,
+        })
+      : response
+  }
+
+  // Export all seven in route.ts, preventing Next's automatic non-JSON 405/OPTIONS responses.
+  return {
+    GET: dispatch,
+    POST: dispatch,
+    PUT: dispatch,
+    PATCH: dispatch,
+    DELETE: dispatch,
+    HEAD: dispatch,
+    OPTIONS: dispatch,
+  }
+}
