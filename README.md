@@ -24,12 +24,15 @@ Ensure you have the following installed:
    npm install
    ```
 
-3. **Start the development server:**
+3. **Configure the server:**
+   Copy `.env.example` to `.env.local` and set `APP_ORIGIN` to `http://localhost:3000` for local development. If `.env.local` already exists, add the variables to it. See the [API foundation guide](docs/api-phase-2-foundation.md) for production configuration and the Phase 2 scope.
+
+4. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-4. **Open in browser:**
+5. **Open in browser:**
    Navigate to [http://localhost:3000](http://localhost:3000) to view the app. Hot reload is enabled, so changes in `src/` will reflect immediately.
 
 ### Available Scripts
@@ -40,6 +43,8 @@ Ensure you have the following installed:
 | `npm run build` | Compiles and builds the production application |
 | `npm run start` | Starts the production server after building |
 | `npm run format` | Checks and formats source code with `oxfmt` |
+| `npm run typecheck` | Checks TypeScript types |
+| `npm test` | Runs the API foundation contract tests |
 
 ### Tech Stack
 
