@@ -7,7 +7,7 @@ Follow these steps to get the project up and running on your local machine.
 ### Prerequisites
 
 Ensure you have the following installed:
-- **Node.js** (v18.17+ or v20+ recommended)
+- **Node.js** (v22 LTS or newer)
 - **npm** (bundled with Node.js) or your preferred package manager
 - **Git**
 
@@ -25,7 +25,7 @@ Ensure you have the following installed:
    ```
 
 3. **Configure the server:**
-   Copy `.env.example` to `.env.local` and set `APP_ORIGIN` to `http://localhost:3000` for local development. If `.env.local` already exists, add the variables to it. See the [API foundation guide](docs/api-phase-2-foundation.md) for production configuration and the Phase 2 scope.
+   Copy `.env.example` to `.env.local` and set `APP_ORIGIN` to `http://localhost:3000` for local development. If `.env.local` already exists, add the variables to it. Leave `AUTH_ENABLED=false` until connecting Supabase. See the [API foundation guide](docs/api-phase-2-foundation.md) and [Phase 3 authentication setup](docs/api-phase-3-authentication.md). The frontend remains a prototype; authentication endpoints fail closed until enabled and configured.
 
 4. **Start the development server:**
    ```bash
@@ -44,7 +44,7 @@ Ensure you have the following installed:
 | `npm run start` | Starts the production server after building |
 | `npm run format` | Checks and formats source code with `oxfmt` |
 | `npm run typecheck` | Checks TypeScript types |
-| `npm test` | Runs the API foundation contract tests |
+| `npm test` | Runs API contracts, JWT/CSRF checks, and embedded PostgreSQL session tests |
 
 ### Tech Stack
 

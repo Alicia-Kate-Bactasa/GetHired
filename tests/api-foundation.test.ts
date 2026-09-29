@@ -6,12 +6,15 @@ import {
   API_ERRORS,
   type ApiErrorCode,
 } from "../src/server/api/errors"
-import { createApiRoute, HTTP_METHODS } from "../src/server/api/route"
+import { createApiRoute as createBaseApiRoute, HTTP_METHODS } from "../src/server/api/route"
 import type { ApiResult } from "../src/server/api/responses"
 import { logRequest, type RequestLog } from "../src/server/logging/request"
 
 const config = () => readServerConfig({ APP_ORIGIN: "http://localhost:3000" })
 const silent = () => {}
+// Foundation unit tests isolate response/body behavior; Phase 3 tests exercise CSRF.
+const createApiRoute: typeof createBaseApiRoute = (definition, dependencies) =>
+  createBaseApiRoute(definition, { enforceBrowserProtection: () => {}, ...dependencies })
 const uuid =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
