@@ -4,17 +4,17 @@
 
 **Recommendation:** build a shared API security layer with separate modules for authentication, permissions, validation, and logging. Integrate it into one complete feature first, then apply it across GetHired.
 
-**Status:** Phases 1 and 2 are complete. See [API contracts and security rules](api-phase-1-contract.md) and [Phase 2 implementation and verification](api-phase-2-foundation.md). The shared API foundation is implemented; authentication, authorization policies, feature schemas, audit persistence, and frontend integration remain in Phases 3–7, which have not started.
+**Status:** Phases 1 and 2 are complete. Phase 3's backend implementation is complete with configuration placeholders; the user chose to connect Supabase later. See [API contracts and security rules](api-phase-1-contract.md), [Phase 2 implementation](api-phase-2-foundation.md), and [Phase 3 authentication and setup](api-phase-3-authentication.md). Phases 4–7 remain unstarted.
 
 ## 1. Current state
 
-The frontend remains a prototype after Phase 2:
+The frontend remains a prototype after Phase 3's backend implementation:
 
 - [Login.tsx](../src/components/Login.tsx) simulates login, stores roles in local storage, and runs password reset in the browser.
 - The `/dashboard` and `/admin` pages render without server-side authentication checks.
 - [data.ts](../src/data.ts) contains mock records and predictable default passwords.
 - Company management, student management, and interview features primarily use React state.
-- The shared API wrapper and an unknown-route fallback are implemented. There are no business API routes, database integration, or authentication dependencies yet.
+- The shared API wrapper, unknown-route fallback, and Phase 3 authentication endpoints are implemented. A private database migration and Supabase adapter are ready for connection; no hosted project has been configured or migrated. Business routes and frontend integration remain future work.
 
 **Implication:** middleware needs a trusted backend identity source and persistent storage before it can protect real accounts and data.
 
@@ -121,6 +121,8 @@ Phase 2 builds shared response handling for both outcomes. Later phases implemen
 **Tradeoff:** a wrapper reduces duplication, but a large custom middleware framework would add complexity. Keep composition explicit and small.
 
 ### Phase 3 — Implement JWT authentication and session lifecycle
+
+**Implemented deliverable:** [Backend behavior, configuration placeholders, verification, and deferred live setup](api-phase-3-authentication.md). Only Phase 3 was authorized. Provisioning/recovery companion flows and Phases 4–7 remain separate work.
 
 **Work**
 

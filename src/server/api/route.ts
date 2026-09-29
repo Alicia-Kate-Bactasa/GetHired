@@ -5,6 +5,7 @@ import { logRequest, type RequestLogger } from "../logging/request"
 import { parseBody, readLimitedBody, type BodyFormat } from "./body"
 import { ApiError, type ApiErrorCode } from "./errors"
 import { errorResponse, successResponse, type ApiResult } from "./responses"
+import type { Principal } from "../auth/types"
 
 export const HTTP_METHODS = [
   "GET",
@@ -28,11 +29,13 @@ export interface ApiContext {
   requestId: string
   params: Params
   body: unknown
-  actor: { id: string } | null
+  actor: { id: string; auth?: Principal } | null
 }
 
 interface Endpoint {
   body: BodyFormat
+  /** Opt in only for user-driven business requests, never background polling. */
+  activity?: "user"
   handle: (context: ApiContext) => ApiResult | Promise<ApiResult>
 }
 
@@ -46,11 +49,12 @@ interface RouteDefinition {
 interface Dependencies {
   config?: () => ServerConfig
   logger?: RequestLogger
+  enforceBrowserProtection?: (request: Request) => void | Promise<void>
   /** Later phases must verify identity, session, account state, and endpoint permission here. */
   enforceAccess?: (
     request: Request,
     policy: Extract<AccessPolicy, { kind: "protected" }>,
-  ) => Promise<{ id: string }>
+  ) => Promise<{ id: string; auth?: Principal }>
 }
 
 export function createApiRoute(
@@ -91,11 +95,25 @@ export function createApiRoute(
           : new ApiError("NOT_FOUND")
       }
       const bytes = await readLimitedBody(request, config.maxBodyBytes)
+      if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+        if (dependencies.enforceBrowserProtection)
+          await dependencies.enforceBrowserProtection(request)
+        else {
+          const { getAuthService } = await import("../auth/runtime")
+          getAuthService().browser.assertMutation(request)
+        }
+      }
       if (definition.access.kind === "protected") {
-        // Fail closed until the authentication/authorization phases supply the implementation.
-        if (!dependencies.enforceAccess)
-          throw new ApiError("SERVICE_UNAVAILABLE")
-        actor = await dependencies.enforceAccess(request, definition.access)
+        if (dependencies.enforceAccess)
+          actor = await dependencies.enforceAccess(request, definition.access)
+        else {
+          // Permission mapping remains Phase 4 work; never silently ignore a permission.
+          if (definition.access.permission)
+            throw new ApiError("SERVICE_UNAVAILABLE")
+          const { getAuthService } = await import("../auth/runtime")
+          const auth = await getAuthService().authenticate(request)
+          actor = { id: auth.id, auth }
+        }
         if (
           !actor ||
           !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
@@ -117,6 +135,10 @@ export function createApiRoute(
         }),
         requestId,
       )
+      if (endpoint.activity === "user" && actor?.auth) {
+        const { getAuthService } = await import("../auth/runtime")
+        await getAuthService().recordActivity(actor.auth)
+      }
     } catch (error) {
       const safeError =
         error instanceof ApiError ? error : new ApiError("INTERNAL_ERROR")
