@@ -25,6 +25,11 @@ export default function Signup({ onSignup, onBack }: Props = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // OTP Modal State
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -67,6 +72,19 @@ export default function Signup({ onSignup, onBack }: Props = {}) {
     // Simulate network delay
     setTimeout(() => {
       setLoading(false);
+      setShowOtpModal(true);
+      setOtpCode(""); // Reset just in case
+    }, 800);
+  };
+
+  const handleVerifyOtp = () => {
+    if (otpCode.length < 6 || otpLoading) return;
+    setOtpLoading(true);
+    
+    // Simulate network verification delay
+    setTimeout(() => {
+      setOtpLoading(false);
+      setShowOtpModal(false);
       try {
         // Extract ID from email (e.g. 21100123@usc.edu.ph -> 21100123)
         const extractedId = email.split("@")[0];
@@ -76,8 +94,15 @@ export default function Signup({ onSignup, onBack }: Props = {}) {
     }, 800);
   };
 
+  const handleOtpKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleVerifyOtp();
+    }
+  };
+
   const submitOnEnter = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSignup(e as any);
+    if (e.key === "Enter" && !showOtpModal) handleSignup(e as any);
   };
 
   return (
@@ -342,6 +367,81 @@ export default function Signup({ onSignup, onBack }: Props = {}) {
           </div>
         </div>
       </main>
+
+      {/* ─── OTP Modal ─── */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/35 backdrop-blur-xs animate-in fade-in duration-150">
+          <div 
+            className="bg-white rounded-[32px] max-w-[380px] w-full p-8 shadow-2xl border border-slate-100 text-left animate-in zoom-in-95 duration-150 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setShowOtpModal(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            {/* Icon & Title */}
+            <div className="mb-6 mt-2 flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-full bg-[#EEF5FF] text-[#0066FF] flex items-center justify-center mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <h3 className="text-[26px] font-bold text-[#0F172A] leading-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                Verify your email
+              </h3>
+              <p className="text-[14px] text-slate-500 mt-2.5 leading-relaxed">
+                We've sent a 6-digit verification code to <br/>
+                <span className="font-semibold text-slate-700">{email}</span>
+              </p>
+            </div>
+
+            {/* Input & Action */}
+            <div className="flex flex-col items-center gap-6 mt-8">
+              <input
+                type="text"
+                required
+                maxLength={6}
+                autoFocus
+                placeholder="••••••"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                onKeyDown={handleOtpKeyDown}
+                className="w-full max-w-[280px] bg-slate-50 border border-slate-200 rounded-2xl text-center tracking-[0.55em] font-mono font-bold text-[28px] py-4 text-[#0F172A] outline-none focus:border-[#0066FF] focus:bg-white focus:ring-4 focus:ring-[#0066FF]/10 transition-all placeholder:text-slate-300"
+              />
+
+              <button
+                type="button"
+                disabled={otpCode.length < 6 || otpLoading}
+                onClick={handleVerifyOtp}
+                className="w-16 h-16 rounded-full bg-[#0066FF] hover:bg-[#0052cc] text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:hover:shadow-md cursor-pointer"
+                aria-label="Continue"
+              >
+                {otpLoading ? (
+                  <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" d="M21 12a9 9 0 1 1-6.2-8.56" />
+                  </svg>
+                ) : (
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            
+            <p className="mt-8 text-[13px] text-slate-400 text-center font-medium">
+              Didn't receive the code? <button type="button" className="text-[#0066FF] hover:underline cursor-pointer">Resend</button>
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
