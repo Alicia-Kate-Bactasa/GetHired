@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Props {
   onLogin?: () => void;
@@ -351,6 +352,16 @@ export default function Login({ onLogin, onBack }: Props = {}) {
                     </>
                   )}
                 </button>
+              </div>
+
+              {/* Signup Link */}
+              <div className="text-center pt-2">
+                <p className="text-[13.5px] text-slate-500">
+                  Don&apos;t have an account?{" "}
+                  <Link href="/signup" className="font-semibold text-[#0066FF] hover:text-[#0052cc] hover:underline transition-colors">
+                    Sign up
+                  </Link>
+                </p>
               </div>
             </form>
           </div>
