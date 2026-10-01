@@ -1,4 +1,4 @@
-// Run against a local production build with AUTH_ENABLED=true and valid placeholders.
+// Run against the frontend proxy plus the standalone API with production placeholder auth.
 // Exercises routes that never need a live provider/database; no credentials are submitted.
 import assert from "node:assert/strict"
 
@@ -7,7 +7,10 @@ assert.ok(["localhost", "127.0.0.1"].includes(base.hostname))
 const origin = process.env.APP_ORIGIN ?? "https://gethired.example"
 let count = 0
 async function check(path, status, code, options = {}) {
-  const response = await fetch(new URL(path, base), options)
+  const headers = new Headers(options.headers)
+  // Local smoke harness only; production ingress must overwrite its configured IP header.
+  if (process.env.AUTH_SMOKE_IP_HEADER) headers.set(process.env.AUTH_SMOKE_IP_HEADER, "127.0.0.1")
+  const response = await fetch(new URL(path, base), { ...options, headers })
   assert.equal(response.status, status, `${options.method ?? "GET"} ${path}`)
   assert.equal(response.headers.get("cache-control"), "private, no-store")
   const body = options.method === "HEAD" ? null : await response.json()

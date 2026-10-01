@@ -1,5 +1,7 @@
 # Phase 1: API contracts and security rules
 
+**2026-10-01 amendment:** API hosting and invitation-only decisions below are superseded by the [B0 backend contract](backend-b0-contract.md). The separate Node.js extraction is documented in [B1](backend-b1-extraction.md); existing resource/session/privacy contracts otherwise remain the baseline.
+
 **Date:** 2026-09-28  
 **Status:** Phase 1 complete; endpoint inventory, permission matrix, and authentication contract agreed.  
 **Scope:** Phase 1 of the [implementation plan](api-middleware-implementation-plan.md). This document specifies future behavior. It does not implement routes, middleware, database tables, or frontend integration.

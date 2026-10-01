@@ -1,5 +1,7 @@
 # Phase 2: Shared API foundation
 
+**2026-10-01 extraction:** The shared API implementation now lives in `apps/api/src` and executes in a separate Node.js service. Follow the [B1 guide](backend-b1-extraction.md) for current setup and commands; the earlier design and verification below are historical context.
+
 **Status:** Complete. Implements only Phase 2 of the [implementation plan](api-middleware-implementation-plan.md), using the [Phase 1 contract](api-phase-1-contract.md).
 
 ## What is available

@@ -1,5 +1,7 @@
 # Phase 3: JWT authentication and session lifecycle
 
+**2026-10-01 extraction:** The implementation described below now lives under `apps/api/src` in the standalone Node.js service. Follow [B1 setup](backend-b1-extraction.md) for current environment locations and commands. Live Supabase verification remains pending. Public student registration is planned in B5 under the revised [B0 contract](backend-b0-contract.md).
+
 **Status:** Backend implementation complete with configuration placeholders. Live Supabase connection and verification are deferred by the user's choice. No cloud resources or accounts have been created, and the migration has not been applied to a hosted database.
 
 Read together with the [Phase 2 foundation](api-phase-2-foundation.md) and [Phase 1 contract](api-phase-1-contract.md). Phase 1 takes precedence over the draft plan's suggestion to store application-owned refresh-token hashes: Supabase owns issuance, rotation, and reuse detection.

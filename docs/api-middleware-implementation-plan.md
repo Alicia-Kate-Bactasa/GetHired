@@ -2,6 +2,8 @@
 
 ## [API] JWT, authorization, validation, and logging middleware
 
+**Backend direction update (2026-10-01):** See the [backend implementation plan](backend-implementation-plan.md) for B0–B8 delivery phases. B1 has migrated phases 1–3 into a separate Node.js API with a thin Next.js proxy; see [current setup](backend-b1-extraction.md). Supabase database/Auth remain selected. Student self-registration with activation after verification of an eight-digit `@usc.edu.ph` email is confirmed for B5. Next.js API hosting and invitation-only assumptions below describe the earlier design. Live Supabase/Render setup and business features remain pending.
+
 **Recommendation:** build a shared API security layer with separate modules for authentication, permissions, validation, and logging. Integrate it into one complete feature first, then apply it across GetHired.
 
 **Status:** Phases 1 and 2 are complete. Phase 3's backend implementation is complete with configuration placeholders; the user chose to connect Supabase later. See [API contracts and security rules](api-phase-1-contract.md), [Phase 2 implementation](api-phase-2-foundation.md), and [Phase 3 authentication and setup](api-phase-3-authentication.md). Phases 4–7 remain unstarted.

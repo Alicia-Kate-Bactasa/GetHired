@@ -7,7 +7,7 @@ Follow these steps to get the project up and running on your local machine.
 ### Prerequisites
 
 Ensure you have the following installed:
-- **Node.js** (v22 LTS or newer)
+- **Node.js** 22.22.0 (see `.node-version`)
 - **npm** (bundled with Node.js) or your preferred package manager
 - **Git**
 
@@ -25,9 +25,13 @@ Ensure you have the following installed:
    ```
 
 3. **Configure the server:**
-   Copy `.env.example` to `.env.local` and set `APP_ORIGIN` to `http://localhost:3000` for local development. If `.env.local` already exists, add the variables to it. Leave `AUTH_ENABLED=false` until connecting Supabase. See the [API foundation guide](docs/api-phase-2-foundation.md) and [Phase 3 authentication setup](docs/api-phase-3-authentication.md). The frontend remains a prototype; authentication endpoints fail closed until enabled and configured.
+   Copy `.env.example` to `.env.local` and `apps/api/.env.example` to `apps/api/.env.local`; merge settings if files already exist. Generate one random `API_GATEWAY_SECRET` and set the same value in both files. Keep `AUTH_ENABLED=false` in the API environment until connecting Supabase. Follow the [separate API setup guide](docs/backend-b1-extraction.md#local-setup). The frontend remains a prototype; authentication endpoints fail closed until enabled and configured.
 
-4. **Start the development server:**
+4. **Start the API and frontend in separate terminals:**
+   ```bash
+   npm run dev:api
+   ```
+
    ```bash
    npm run dev
    ```
@@ -40,15 +44,20 @@ Ensure you have the following installed:
 | Command | Description |
 | --- | --- |
 | `npm run dev` | Runs the Next.js development server at `http://localhost:3000` |
+| `npm run dev:api` | Runs the separate API at `http://localhost:4000` |
 | `npm run build` | Compiles and builds the production application |
+| `npm run build:api` | Builds shared contracts and the standalone API |
 | `npm run start` | Starts the production server after building |
+| `npm run start:api` | Starts the compiled API using supplied environment variables |
 | `npm run format` | Checks and formats source code with `oxfmt` |
 | `npm run typecheck` | Checks TypeScript types |
-| `npm test` | Runs API contracts, JWT/CSRF checks, and embedded PostgreSQL session tests |
+| `npm test` | Runs API, JWT/CSRF, embedded PostgreSQL, and proxy tests |
+| `npm run test:http` | After both builds, verifies temporary local production API/frontend services |
 
 ### Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
+- **Backend:** Separate Node.js + Express 5 API; Supabase Auth/PostgreSQL adapters (live setup pending)
 - **UI Library:** React 19
 - **Styling:** Tailwind CSS v4
 - **Language:** TypeScript
