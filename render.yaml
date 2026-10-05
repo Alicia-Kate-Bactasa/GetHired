@@ -1,0 +1,46 @@
+# Review region and paid plan before creating resources. No automatic deployment.
+services:
+  - type: web
+    name: gethired-staging-api
+    runtime: node
+    plan: starter
+    region: singapore
+    autoDeployTrigger: off
+    buildCommand: npm ci && npm run build:api
+    startCommand: npm run start:api
+    healthCheckPath: /api/health/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AUTH_ENABLED
+        value: "true"
+      - key: AUTH_TRUSTED_IP_HEADER
+        value: x-gethired-client-ip
+      - key: SUPABASE_JWT_ALGORITHMS
+        value: ES256
+      - key: APP_ORIGIN
+        sync: false
+      - key: API_GATEWAY_SECRET
+        sync: false
+      - key: AUTH_COOKIE_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+  - type: cron
+    name: gethired-staging-maintenance
+    runtime: node
+    plan: starter
+    region: singapore
+    schedule: "*/5 * * * *"
+    autoDeployTrigger: off
+    buildCommand: npm ci && npm run build:api
+    startCommand: node apps/api/dist/jobs/maintenance.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MAINTENANCE_DATABASE_URL
+        sync: false

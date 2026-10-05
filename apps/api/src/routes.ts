@@ -1,9 +1,17 @@
 import { createApiRoute } from "./api/route.js"
 import { ApiError } from "./api/errors.js"
-import { getAuthService } from "./auth/runtime.js"
+import { getAuthService, checkReadiness } from "./auth/runtime.js"
 
 export function createRoutes() {
   const routes = new Map<string, ReturnType<typeof createApiRoute>>()
+  routes.set("/api/health/ready", createApiRoute({
+    route: "/api/health/ready",
+    access: { kind: "public" },
+    methods: { GET: { body: "none", handle: async () => {
+      await checkReadiness()
+      return { data: { status: "ok" } }
+    } } },
+  }))
   routes.set("/api/health/live", createApiRoute({
     route: "/api/health/live",
     access: { kind: "public" },

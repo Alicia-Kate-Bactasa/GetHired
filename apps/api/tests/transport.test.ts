@@ -4,6 +4,7 @@ import { createServer, request as httpRequest, type Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import createApp from "../src/app.js"
 import { readTransportConfig } from "../src/http/config.js"
+import { closeAuthService } from "../src/auth/runtime.js"
 
 const gateway = "cd".repeat(32)
 const origin = "https://gethired.example"
@@ -22,6 +23,7 @@ before(async () => {
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
 })
 after(async () => {
+  await closeAuthService()
   server.closeAllConnections()
   await new Promise<void>((resolve) => server.close(() => resolve()))
 })
@@ -49,8 +51,10 @@ async function browser() {
     Cookie: cookie.split(";")[0], "X-CSRF-Token": body.data.csrfToken }
 }
 
-test("only the live GET probe bypasses gateway authentication", async () => {
+test("only GET health probes bypass gateway authentication", async () => {
   assert.equal((await fetch(`${base}/api/health/live`)).status, 200)
+  await expectError(await fetch(`${base}/api/health/ready`), 503, "SERVICE_UNAVAILABLE")
+  await expectError(await fetch(`${base}/api/health/ready`, { method: "POST" }), 403, "FORBIDDEN")
   await expectError(await fetch(`${base}/api/auth/csrf`), 403, "FORBIDDEN")
   await expectError(await fetch(`${base}/api/health/live`, { method: "POST" }), 403, "FORBIDDEN")
   await expectError(await fetch(`${base}/api/auth/me`, { headers: {

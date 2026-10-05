@@ -1,7 +1,7 @@
 # GetHired backend implementation plan
 
 **Date:** 2026-10-01  
-**Status:** B0 extraction decisions established and B1 implemented locally. See the [B0 contract amendment](backend-b0-contract.md) and [B1 implementation/setup](backend-b1-extraction.md). B2–B8 remain pending; later feature choices remain open for review.
+**Status:** B0 extraction decisions established and B1 implemented locally. B2 repository foundation is implemented; hosted setup and acceptance remain pending. See the [B0 contract amendment](backend-b0-contract.md), [B1 implementation/setup](backend-b1-extraction.md), and [B2 staging setup](backend-b2-staging.md). B3–B8 remain pending; later feature choices remain open for review.
 **Confirmed for this plan:** a separate Node.js API deployed to Render, retaining Supabase PostgreSQL and Supabase Auth, with student self-registration as well as administrator invitations. Students activate after verifying an eight-digit student ID email at `@usc.edu.ph`; administrator approval is not required.
 
 This extends the [middleware implementation plan](api-middleware-implementation-plan.md). Backend phases below use **B0–B8** so they cannot be confused with middleware phases 1–7. The completed middleware work is the starting point; moving it requires adaptation and verification, not rebuilding authentication from scratch.
@@ -405,7 +405,7 @@ Migrate auth ownership in one cutover. Backend availability and proxy forwarding
 | Supabase PostgreSQL and Auth | Confirmed by user | Established |
 | Student self-registration plus invitations | Confirmed by user | Established |
 | Express + TypeScript and same-origin frontend proxy | Proposed implementation default | B1 |
-| Frontend host and trusted ingress/IP source | Open; must support server proxy/page checks | B2 |
+| Frontend host and trusted ingress/IP source | Vercel confirmed; `x-vercel-forwarded-for` selected, deployed spoofing verification pending | B2 |
 | Signup activation | Confirmed: verified eight-digit USC student email activates the account; collect required profile during signup; no administrator approval | Established; implement B5 |
 | Feedback | Proposed rubric guidance without numeric scores first; actual AI evaluation is a separate reviewed choice | B7 |
 | Launch scope | First milestone B1–B4; full onboarding/practice release B1–B8 | Release planning |

@@ -27,7 +27,7 @@ export default function createApp(transport: TransportConfig) {
       const url = new URL(request.originalUrl, "http://api.internal")
       const handler = routes.get(url.pathname) ?? missing
       if (routes.has(url.pathname)) route = url.pathname
-      const isProbe = url.pathname === "/api/health/live" && request.method === "GET"
+      const isProbe = ["/api/health/live", "/api/health/ready"].includes(url.pathname) && request.method === "GET"
       if (!isProbe) {
         const provided = request.headers[GATEWAY_HEADER]
         if (typeof provided !== "string" || !/^[a-f0-9]{64}$/i.test(provided) ||
