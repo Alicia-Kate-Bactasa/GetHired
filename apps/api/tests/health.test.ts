@@ -40,3 +40,18 @@ test("readiness shares concurrent probes and retries after connection failure", 
   await assert.rejects(probe(), { code: "SERVICE_UNAVAILABLE" })
   assert.equal(connections, 2)
 })
+
+test("readiness diagnostics categorize failures, suppress secrets and throttle repeated logs", async () => {
+  for (const [code, reason] of [["28P01", "database_login_rejected"],
+    ["42501", "database_permission_denied"], ["SELF_SIGNED_CERT_IN_CHAIN", "database_tls_failed"],
+    ["secret-driver-code", "database_probe_failed"]]) {
+    const reports: unknown[] = []
+    const probe = createReadinessProbe({ async connect() {
+      throw Object.assign(new Error("postgresql://user:secret@host"), { code })
+    } }, (failure) => reports.push(failure))
+    await assert.rejects(probe(), { code: "SERVICE_UNAVAILABLE" })
+    await assert.rejects(probe(), { code: "SERVICE_UNAVAILABLE" })
+    assert.deepEqual(reports, [{ event: "api.readiness.failed", stage: "connect", reason }])
+    assert.equal(JSON.stringify(reports).includes("secret"), false)
+  }
+})

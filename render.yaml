@@ -6,7 +6,7 @@ services:
     plan: starter
     region: singapore
     autoDeployTrigger: off
-    buildCommand: npm ci && npm run build:api
+    buildCommand: npm ci --include=dev && npm run build:api
     startCommand: npm run start:api
     healthCheckPath: /api/health/ready
     envVars:
@@ -37,7 +37,7 @@ services:
     region: singapore
     schedule: "*/5 * * * *"
     autoDeployTrigger: off
-    buildCommand: npm ci && npm run build:api
+    buildCommand: npm ci --include=dev && npm run build:api
     startCommand: node apps/api/dist/jobs/maintenance.js
     envVars:
       - key: NODE_ENV

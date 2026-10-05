@@ -126,13 +126,18 @@ for negative acceptance checks as well.
 ## 4. Configure Render and Vercel
 
 Review `render.yaml`, then connect the repository in Render. Use repository root,
-Node from `.node-version`, build `npm ci && npm run build:api`, start
+Node from `.node-version`, build `npm ci --include=dev && npm run build:api`, start
 `npm run start:api`, and health path `/api/health/ready`. Enter secret values in
 Render's dashboard. Set `DATABASE_URL` to the runtime login. Only the cron job gets
 `MAINTENANCE_DATABASE_URL` using the cleanup login. Generate distinct 64-hex gateway
 and cookie secrets; the cookie secret must stay stable across API instances.
 Set `APP_ORIGIN` to the stable Vercel HTTPS staging origin, without a path.
 See [Render Blueprint settings](https://render.com/docs/blueprint-spec).
+
+Keep `NODE_ENV=production`. The explicit `--include=dev` installs TypeScript and
+the Node/Express/pg type definitions needed during compilation; otherwise npm omits
+them in production. For services created manually, update the Build Command in
+Render's dashboard as well as this repository's Blueprint.
 
 Import the same repository in Vercel as Next.js with repository root and
 `npm run build`. Select Node 22.x. Scope these server-only variables to staging:
